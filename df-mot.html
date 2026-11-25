@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DF-MOT">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>DF-MOT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+:root{
+  --blue:#2563EB;--blue-l:#DBEAFE;--blue-m:#93C5FD;
+  --green:#16A34A;--green-l:#DCFCE7;
+  --red:#DC2626;--red-l:#FEE2E2;
+  --slate:#334155;--mid:#64748B;--light:#CBD5E1;--bg:#F8FAFC;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--slate);min-height:100vh;}
+.screen{display:none;min-height:100vh;}
+.screen.on{display:flex;flex-direction:column;}
+
+/* ── PROFILES ── */
+#scProfiles{align-items:center;padding-top:60px;}
+.pw{width:100%;max-width:660px;padding:0 20px;}
+.pw h1{font-size:26px;font-weight:700;color:var(--blue);}
+.pw p{font-size:13px;color:var(--mid);margin:4px 0 28px;}
+.pcard{background:var(--white);border:1.5px solid var(--light);border-radius:12px;
+  padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;
+  transition:border-color .15s;margin-bottom:10px;}
+.pcard:hover{border-color:var(--blue);}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--blue-l);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
+.pinfo{flex:1;}
+.pname{font-size:14px;font-weight:600;}
+.pmeta{font-size:11px;color:var(--mid);margin-top:2px;}
+.psess{font-size:11px;color:var(--blue);font-weight:600;margin-top:2px;}
+.del-btn{background:none;border:1px solid var(--light);border-radius:6px;padding:5px 9px;
+  cursor:pointer;font-size:12px;color:var(--mid);}
+.del-btn:hover{border-color:var(--red);color:var(--red);}
+.new-btn{background:var(--blue);color:#fff;border:none;border-radius:10px;
+  padding:13px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:4px;}
+.new-btn:hover{background:#1D4ED8;}
+.empty{text-align:center;color:var(--mid);padding:32px 0;font-size:13px;}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;
+  align-items:center;justify-content:center;}
+.overlay.on{display:flex;}
+.modal{background:#fff;border-radius:14px;padding:26px;width:100%;max-width:420px;}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:18px;}
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--mid);margin-bottom:4px;}
+.fg input{width:100%;border:1.5px solid var(--light);border-radius:7px;
+  padding:8px 11px;font-family:inherit;font-size:13px;color:var(--slate);background:var(--bg);}
+.fg input:focus{outline:2px solid var(--blue);border-color:var(--blue);}
+.mact{display:flex;gap:8px;margin-top:18px;}
+.mbtn{flex:1;border-radius:7px;padding:10px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.mbtn.pri{background:var(--blue);color:#fff;}
+.mbtn.pri:hover{background:#1D4ED8;}
+.mbtn.sec{background:var(--bg);color:var(--slate);border:1.5px solid var(--light);}
+
+/* ── EVAL SCREEN ── */
+header{background:#fff;border-bottom:2px solid var(--blue);padding:9px 22px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(37,99,235,.07);}
+.back{background:none;border:1.5px solid var(--light);border-radius:7px;padding:5px 11px;
+  font-family:inherit;font-size:12px;font-weight:600;color:var(--mid);cursor:pointer;}
+.back:hover{border-color:var(--blue);color:var(--blue);}
+.hpat{font-size:14px;font-weight:700;}
+.hdob{font-size:11px;color:var(--mid);}
+.hright{margin-left:auto;}
+.prtbtn{background:var(--blue);color:#fff;border:none;border-radius:6px;
+  padding:7px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+
+/* sessions bar */
+.sessbar{background:#fff;border-bottom:1px solid var(--light);padding:0 22px;
+  display:flex;align-items:center;overflow-x:auto;gap:0;}
+.stab{padding:9px 16px;font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;
+  border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.stab:hover{color:var(--blue);}
+.stab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.addsbtn{padding:6px 12px;font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-l);
+  border:none;border-radius:6px;cursor:pointer;margin-left:10px;flex-shrink:0;}
+
+/* subtabs */
+.subtabs{background:#fff;border-bottom:1px solid var(--light);padding:0 22px;display:flex;}
+.subtab{padding:8px 18px;font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;
+  border-bottom:3px solid transparent;}
+.subtab:hover{color:var(--blue);}
+.subtab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
+
+/* main layout */
+.main{display:grid;grid-template-columns:1fr 400px;gap:18px;padding:18px 22px;max-width:1580px;margin:0 auto;}
+
+/* items */
+.iheader{display:grid;gap:5px;padding:4px 8px;
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);}
+.ipanel{display:flex;flex-direction:column;gap:3px;}
+.agroup{margin-bottom:2px;}
+.aglabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--blue);padding:4px 9px;background:var(--blue-l);border-radius:4px;
+  margin-bottom:3px;display:flex;justify-content:space-between;align-items:center;transition:all .2s;}
+.irow{display:grid;gap:5px;align-items:start;padding:6px 8px;background:#fff;
+  border-radius:5px;border:1px solid var(--light);font-size:12px;transition:border-color .12s;}
+.irow:hover{border-color:var(--blue-m);}
+.irow.ok{background:var(--green-l);border-color:#86EFAC;}
+.inum{font-size:10px;font-weight:700;color:var(--mid);text-align:center;padding-top:1px;}
+.idesc{line-height:1.4;color:var(--slate);}
+.iage{font-size:10px;color:var(--mid);text-align:center;font-weight:500;}
+.isd{font-size:10px;color:var(--mid);text-align:center;}
+.ichk{display:flex;align-items:center;justify-content:center;}
+.chk{width:22px;height:22px;border:2px solid var(--light);border-radius:4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;background:#fff;flex-shrink:0;}
+.chk:hover{border-color:var(--blue);}
+.chk.on{border-color:var(--green);background:var(--green);}
+.chk.on svg{display:block;}
+.chk svg{display:none;pointer-events:none;}
+.chk.dim{opacity:.25;cursor:default;}
+
+/* right */
+.rp{display:flex;flex-direction:column;gap:12px;}
+.card{background:#fff;border-radius:10px;border:1px solid var(--light);padding:15px;}
+.ctitle{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:11px;}
+.nmfbox{background:var(--blue);color:#fff;border-radius:8px;padding:11px;text-align:center;margin-bottom:9px;}
+.nmfv{font-size:24px;font-weight:700;}
+.nmfl{font-size:9px;opacity:.8;text-transform:uppercase;letter-spacing:.1em;}
+.sdd{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px;border-radius:7px;background:var(--bg);}
+.sdv{font-size:17px;font-weight:700;}
+.sdv.pos{color:var(--green);}.sdv.neg{color:var(--red);}.sdv.z{color:var(--mid);}
+.sdlbl{font-size:10px;color:var(--mid);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px;}
+.sbox{background:var(--bg);border-radius:7px;padding:9px;text-align:center;}
+.sval{font-size:18px;font-weight:700;color:var(--blue);}
+.slbl{font-size:9px;color:var(--mid);text-transform:uppercase;margin-top:2px;}
+.pb{height:5px;background:var(--light);border-radius:99px;overflow:hidden;margin-top:9px;}
+.pbf{height:100%;background:var(--blue);border-radius:99px;transition:width .4s;}
+.pbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mid);margin-bottom:2px;margin-top:8px;}
+#cvs{width:100%;border-radius:7px;}
+.leg{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--mid);}
+.ld{width:9px;height:9px;border-radius:50%;}
+.ll{width:14px;height:3px;border-radius:2px;}
+textarea.notes{width:100%;border:1px solid var(--light);border-radius:6px;padding:8px;
+  font-family:inherit;font-size:12px;color:var(--slate);resize:vertical;min-height:70px;background:var(--bg);}
+textarea.notes:focus{outline:2px solid var(--blue);}
+.orig{display:flex;flex-direction:column;gap:5px;}
+.orig label{font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.ptabs{display:flex;border-bottom:1px solid var(--light);margin-bottom:10px;}
+.ptab{padding:5px 11px;font-size:11px;font-weight:500;color:var(--mid);cursor:pointer;border-bottom:2px solid transparent;}
+.ptab.on{color:var(--blue);border-bottom-color:var(--blue);}
+.pane{display:none;}.pane.on{display:block;}
+.bbadge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;background:rgba(255,255,255,.35);}
+.calc-btn{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:11px;
+  font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:12px;
+  transition:background .15s;letter-spacing:.01em;}
+.calc-btn:hover{background:#1D4ED8;}
+
+@media(max-width:860px){.main{grid-template-columns:1fr;padding:10px 12px;}}
+@media print{
+  #scProfiles{display:none!important;}
+  .back,.addsbtn,.prtbtn{display:none;}
+  header{position:static;}
+  .main{grid-template-columns:1fr;}
+  .rp{order:-1;}
+}
+
+.io-bar{display:flex;gap:8px;margin-top:12px;}
+.io-btn{flex:1;padding:10px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--light);background:var(--white);color:var(--slate);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.io-btn:hover{border-color:var(--blue);color:var(--blue);}
+.io-btn.exp{border-color:var(--green);color:var(--green);}
+.io-btn.exp:hover{background:var(--green-l);}
+.io-btn.imp{border-color:var(--blue);color:var(--blue);}
+.io-btn.imp:hover{background:var(--blue-l);}
+.pwd-modal{background:#fff;border-radius:14px;padding:26px;width:100%;max-width:380px;}
+.pwd-modal h2{font-size:16px;font-weight:700;margin-bottom:6px;}
+.pwd-modal p{font-size:12px;color:var(--mid);margin-bottom:16px;line-height:1.5;}
+.pwd-input{width:100%;border:1.5px solid var(--light);border-radius:7px;padding:9px 12px;font-family:inherit;font-size:15px;letter-spacing:.1em;background:var(--bg);margin-bottom:4px;}
+.pwd-input:focus{outline:2px solid var(--blue);border-color:var(--blue);}
+.pwd-hint{font-size:11px;color:var(--mid);margin-bottom:14px;}
+/* ── TONUS PANEL ── */
+.tonus-section{margin-bottom:18px;}
+.tonus-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--white);background:var(--blue);padding:6px 12px;border-radius:6px;margin-bottom:8px;}
+.tonus-card{background:var(--white);border:1px solid var(--light);border-radius:8px;
+  padding:12px 14px;margin-bottom:6px;}
+.tonus-card-title{font-size:12px;font-weight:700;color:var(--slate);margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;}
+.tonus-norm{font-size:10px;color:var(--mid);background:var(--bg);border-radius:4px;
+  padding:3px 7px;font-weight:500;}
+.tonus-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.tonus-label{font-size:11px;color:var(--mid);min-width:60px;}
+.tonus-opts{display:flex;gap:5px;flex-wrap:wrap;}
+.topt{padding:5px 10px;border-radius:6px;border:1.5px solid var(--light);font-size:11px;
+  font-weight:600;cursor:pointer;background:var(--white);color:var(--slate);transition:all .12s;white-space:nowrap;}
+.topt:hover{border-color:var(--blue);color:var(--blue);}
+.topt.sel-ok{background:var(--green);border-color:var(--green);color:#fff;}
+.topt.sel-p1{background:#F59E0B;border-color:#F59E0B;color:#fff;}
+.topt.sel-p2{background:var(--red);border-color:var(--red);color:#fff;}
+.topt.sel-asy{background:#7C3AED;border-color:#7C3AED;color:#fff;}
+.topt.sel-abs{background:var(--mid);border-color:var(--mid);color:#fff;}
+.topt.sel-part{background:#0891B2;border-color:#0891B2;color:#fff;}
+.tonus-dg{display:flex;gap:8px;align-items:center;margin-top:2px;}
+.dg-label{font-size:10px;font-weight:700;color:var(--mid);min-width:16px;}
+.norm-badge{display:inline-block;font-size:9px;background:var(--blue-l);color:var(--blue);
+  border-radius:3px;padding:1px 5px;font-weight:600;margin-left:4px;}
+.tonus-note{width:100%;border:1px solid var(--light);border-radius:5px;padding:6px 8px;
+  font-family:inherit;font-size:11px;color:var(--slate);resize:vertical;min-height:40px;
+  background:var(--bg);margin-top:6px;}
+.ag-info{font-size:11px;color:var(--blue);font-weight:600;background:var(--blue-l);
+  padding:6px 12px;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ── ANAMNESE & OBS PANELS ── */
+.bilan-panel{max-width:900px;margin:0 auto;padding:0 0 40px 0;width:100%;}
+.bilan-section{background:var(--white);border:1px solid var(--light);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.bilan-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--white);background:var(--slate);padding:10px 16px;}
+.bilan-field{padding:12px 16px;border-bottom:1px solid var(--slate-bg);}
+.bilan-field:last-child{border-bottom:none;}
+.bilan-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--mid);margin-bottom:5px;}
+.bilan-field textarea{width:100%;border:1.5px solid var(--light);border-radius:7px;padding:9px 12px;
+  font-family:inherit;font-size:13px;color:var(--slate);resize:vertical;min-height:60px;
+  background:var(--slate-bg);transition:border-color .12s;}
+.bilan-field textarea:focus{outline:none;border-color:var(--blue);}
+.bilan-field input[type=text]{width:100%;border:1.5px solid var(--light);border-radius:7px;
+  padding:8px 12px;font-family:inherit;font-size:13px;color:var(--slate);background:var(--slate-bg);}
+.bilan-field input[type=text]:focus{outline:none;border-color:var(--blue);}
+
+/* Observation tables */
+.obs-table{width:100%;border-collapse:collapse;font-size:12px;}
+.obs-table th{background:var(--slate-bg);font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--mid);padding:7px 10px;border:1px solid var(--light);text-align:center;}
+.obs-table td{padding:6px 10px;border:1px solid var(--light);vertical-align:middle;}
+.obs-table td:first-child{font-size:12px;color:var(--slate);background:var(--slate-bg);font-weight:500;}
+.obs-table tr:nth-child(even) td:first-child{background:#f1f5f9;}
+.obs-table tr:nth-child(even) td{background:#fafbfc;}
+.obs-cb-cell{text-align:center;}
+.obs-radio{width:18px;height:18px;cursor:pointer;accent-color:var(--blue);}
+.prehension-row td{font-size:11px;color:var(--mid);}
+.obs-comment{width:100%;border:1px solid var(--light);border-radius:4px;padding:4px 7px;
+  font-family:inherit;font-size:11px;color:var(--slate);background:var(--slate-bg);resize:none;min-height:28px;}
+.obs-section-sep{height:8px;background:var(--slate-bg);}
+
+</style>
+</head>
+<body>
+
+<!-- PROFILES -->
+<div id="scProfiles" class="screen on">
+  <div class="pw">
+    <h1>DF-MOT</h1>
+    <p>Bilan du Développement Fonctionnel Moteur — Vaivre-Douret (1997)</p>
+    <div id="plist"></div>
+    <button class="new-btn" data-action="openNewProfile">＋ Nouveau patient</button>
+    <div class="io-bar">
+      <button class="io-btn exp" data-action="exportData">⬇ Exporter les données</button>
+      <button class="io-btn imp" data-action="importData">⬆ Importer les données</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+    <p style="font-size:11px;color:var(--mid);margin-top:10px;line-height:1.5;text-align:center">
+      Export/Import protégé par mot de passe · Données chiffrées localement
+    </p>
+  </div>
+</div>
+
+<!-- EVAL -->
+<div id="scEval" class="screen">
+  <header>
+    <button class="back" data-action="goBack">← Patients</button>
+    <div><div class="hpat" id="hname">—</div><div class="hdob" id="hdob">—</div><div class="hage" id="hage" style="font-size:11px;color:var(--mid);margin-top:1px;display:none"></div></div>
+    <div class="hright"><button class="prtbtn" data-action="print">🖨 Imprimer</button></div>
+  </header>
+  <div class="sessbar" id="sessbar"></div>
+  <div class="subtabs">
+    <div class="subtab" data-action="switchSec" data-sec="anamnese">Anamnèse</div>
+    <div class="subtab on" data-action="switchSec" data-sec="pml">PML — Posturo-Moteur &amp; Locomoteur</div>
+    <div class="subtab" data-action="switchSec" data-sec="pcvm">PCVM — Préhension Visuo-Manuelle</div>
+    <div class="subtab" data-action="switchSec" data-sec="tonus">Tonus Passif &amp; Actif</div>
+    <div class="subtab" data-action="switchSec" data-sec="obs">Observation Clinique</div>
+  </div>
+  <div class="main">
+    <div id="anamnesePanel" style="display:none"></div>
+    <div id="pmlPcvmPanel">
+      <div class="iheader" id="iheader"></div>
+      <div class="ipanel" id="ipanel"></div>
+    </div>
+    <div id="tonusPanel" style="display:none"></div>
+    <div id="obsPanel" style="display:none"></div>
+    <div class="rp">
+      <div class="card">
+        <div class="ctitle">Résultats — Passation active</div>
+        <div class="sgrid">
+          <div class="sbox"><div class="sval" id="sc">0</div><div class="slbl">Items réussis</div></div>
+          <div class="sbox"><div class="sval" id="st">0</div><div class="slbl">Total items</div></div>
+        </div>
+        <div class="pbl"><span>Progression</span><span id="spct">0%</span></div>
+        <div class="pb"><div class="pbf" id="pbf" style="width:0%"></div></div>
+        <button class="calc-btn" data-action="calcNMF">📊 Calculer NMF &amp; Écart-type</button>
+        <div id="nmfblock" style="display:none;margin-top:12px">
+          <div class="nmfbox"><div class="nmfv" id="nmfv">—</div><div class="nmfl">Niveau Moteur Fonctionnel</div></div>
+          <div class="sdd"><div class="sdv z" id="sdv">—</div><div class="sdlbl">σ par rapport à l'âge chronologique</div></div>
+          <div id="nmfdetail" style="font-size:11px;color:var(--mid);margin-top:8px;line-height:1.6;background:var(--bg);border-radius:6px;padding:8px"></div>
+          <button class="calc-btn" style="background:#334155;margin-top:8px" data-action="genReport">📋 Générer le compte rendu</button>
+        </div>
+      </div>
+      <div class="card" id="curveCard1">
+        <div class="ctitle" id="curveTitle1">Courbe 1</div>
+        <canvas id="cvs1" height="380"></canvas>
+        <div class="leg" id="leg1"></div>
+      </div>
+      <div class="card" id="curveCard2">
+        <div class="ctitle" id="curveTitle2">Courbe 2</div>
+        <canvas id="cvs2" height="380"></canvas>
+        <div class="leg" id="leg2"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">Observations</div>
+        <div class="ptabs">
+          <div class="ptab on" data-action="switchPtab" data-pane="pnotes">Notes</div>
+          <div class="ptab" data-action="switchPtab" data-pane="porig">Origine</div>
+        </div>
+        <div id="pnotes" class="pane on">
+          <textarea class="notes" id="notestx" placeholder="Notes cliniques…" data-action="saveNotes"></textarea>
+        </div>
+        <div id="porig" class="pane">
+          <div class="orig">
+            <label><input type="checkbox" class="ocb" data-k="gen"> Génétique</label>
+            <label><input type="checkbox" class="ocb" data-k="cen"> Centrale</label>
+            <label><input type="checkbox" class="ocb" data-k="per"> Périphérique</label>
+            <label><input type="checkbox" class="ocb" data-k="pos"> Posturale ostéomusculaire</label>
+            <label><input type="checkbox" class="ocb" data-k="psy"> Psycho-affective</label>
+            <label><input type="checkbox" class="ocb" data-k="aut"> Autre</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NEW PROFILE -->
+<div class="overlay" id="ovProfile">
+  <div class="modal">
+    <h2>Nouveau patient</h2>
+    <div class="fg"><label>Nom</label><input id="mnom" type="text" placeholder="Nom de famille"></div>
+    <div class="fg"><label>Prénom</label><input id="mprenom" type="text" placeholder="Prénom"></div>
+    <div class="fg"><label>Date de naissance</label><input id="mdob" type="date"></div>
+    <div class="fg">
+      <label>Prématurité</label>
+      <div style="display:flex;align-items:center;gap:10px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0">
+          <input type="checkbox" id="mprem" data-action="togglePrem">
+          Naissance prématurée
+        </label>
+      </div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        <input id="msa" type="number" min="24" max="36" placeholder="ex: 32" disabled
+          style="width:90px;border:1.5px solid var(--light);border-radius:7px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--bg);">
+        <span style="font-size:12px;color:var(--mid)">semaines d'aménorrhée (SA)</span>
+      </div>
+      <div style="font-size:11px;color:var(--mid);margin-top:5px">Âge corrigé = âge chronologique − (40 − SA) semaines</div>
+    </div>
+    <div class="mact">
+      <button class="mbtn sec" data-action="closeOv" data-ov="ovProfile">Annuler</button>
+      <button class="mbtn pri" data-action="createProfile">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PASSWORD -->
+<div class="overlay" id="ovPwd">
+  <div class="pwd-modal">
+    <h2 id="pwdTitle">Exporter les données</h2>
+    <p id="pwdDesc">Choisissez un mot de passe pour chiffrer vos données. Vous en aurez besoin pour les importer.</p>
+    <input class="pwd-input" type="password" id="pwdInput" placeholder="Mot de passe" autocomplete="new-password">
+    <div class="pwd-hint" id="pwdHint">Le fichier sera illisible sans ce mot de passe.</div>
+    <div class="mact">
+      <button class="mbtn sec" data-action="closeOv" data-ov="ovPwd">Annuler</button>
+      <button class="mbtn pri" id="pwdConfirmBtn" data-action="pwdConfirm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SESSION (create + edit) -->
+<div class="overlay" id="ovSession">
+  <div class="modal">
+    <h2 id="sessModalTitle">Nouvelle passation</h2>
+    <div class="fg"><label>Date d'évaluation</label><input id="sdate" type="date"></div>
+    <div class="mact">
+      <button class="mbtn sec" data-action="closeOv" data-ov="ovSession">Annuler</button>
+      <button class="mbtn pri" id="sessModalBtn" data-action="createSession">Créer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const PML=[
+[1,"Suit la cible en noir et blanc de manière oculocéphalogyre (par saccades) sur au moins 45° de chaque côté",3,1],
+[2,"Positionné en décubitus latéral droit ou gauche, tient seul son équilibre au moins 5 s",3,1],
+[3,"Participe au retournement sollicité par les membres inférieurs (rotation de la tête, appui épaule puis avant-bras, passage actif du bras, dégagement des bras)",3,1],
+[4,"Amené en position assise par les épaules et recouché (aller-retour), maintient au moins 3 s la tête dans l'axe",3,1],
+[5,"Maintenu debout, redresse ses membres inférieurs, puis le tronc et la tête au moins 3 s ; de même sur une seule jambe, l'autre étant maintenue en flexion",3,1],
+[6,"Soutenu en position semi-assise (derrière la nuque), les bras sont relâchés de chaque côté du thorax",3,1],
+[7,"En décubitus ventral, soulève sa tête en vacillant (menton à 2-3 cm), bras fléchis",31,15],
+[8,"En décubitus dorsal, suit un objet de couleur vive sur 180°, horizontalement et verticalement",61,9],
+[9,"En décubitus ventral, bras fléchis sur les avant-bras, soulève sa tête (menton à environ 3-6 cm)",62,32],
+[10,"Maintenu en position assise, tient sa tête dans l'axe, stable et prolongée > à 30 s",64,31],
+[11,"En décubitus ventral, bassin à plat, hanches en extension",91,16],
+[12,"En décubitus ventral, maintient sa tête à 45° du plan de la table en appui sur ses avant-bras (au moins 10 s)",92,25],
+[13,"Maintenu debout, fléchi sur ses membres inférieurs (perte du redressement = astasie)",94,26],
+[14,"En décubitus ventral, maintient sa tête à 90° du plan de la table en appui sur les avant-bras/bras à 90° (au moins 10 s)",121,22],
+[15,"Se retourne seul du décubitus dorsal au décubitus latéral",122,38],
+[16,"En décubitus dorsal, participe au redressement en appui latéral vers la station assise, sollicité activement à l'aide du membre supérieur controlatéral",125,32],
+[17,"Maintenu debout, stade du «sauteur» ou de mouvement de flexion-extension des membres inférieurs",152,31],
+[18,"Amené en position assise par traction sur les avant-bras, participe activement (anticipation de la tête et élévation des membres inférieurs)",154,32],
+[19,"Tient assis seul penché en avant, appuyé sur ses membres supérieurs étendus devant (au moins 15 s)",156,38],
+[20,"Se tient assis seul, dos arrondi, bras levés (au moins 10 s), instable",184,33],
+[21,"Se retourne seul du décubitus dorsal au décubitus ventral",190,39],
+[22,"Se retourne seul du décubitus ventral au décubitus dorsal",196,38],
+[23,"Se tient assis, tronc droit (au moins 30 s), instable",213,45],
+[24,"Manœuvre du plongeon : enfant porté et précipité tête en bas vers le plan de la table ; il étend ses bras en avant",241,30],
+[25,"En décubitus ventral, redresse la tête et le thorax en appui sur ses mains, bras étendus, et peut incurver son tronc pour saisir un jouet latéral",243,35],
+[26,"Se tient assis, stable, s'équilibre après les manœuvres de poussée et peut se pencher seul en avant et reprendre l'équilibre",246,32],
+[27,"Maintenu debout, se redresse globalement",260,32],
+[28,"Rampe en décubitus ventral",262,34],
+[29,"Se relève seul de la position en décubitus à assise (position «lapin» ou appui latéral coude/main)",264,36],
+[30,"Pivote en station assise attiré par un objet et peut se remettre assis droit",282,33],
+[31,"Se met et marche à quatre pattes (paumes-genoux) et se remet assis ou en décubitus",312,33],
+[32,"Se hisse debout avec aide ou appui et peut se remettre au sol",318,48],
+[33,"Se met et se redresse sur ses genoux sans aide",320,34],
+[34,"Se met en position de «chevalier servant» avec l'aide des membres supérieurs et un support",322,33],
+[35,"Se redresse depuis le «chevalier servant», ne tient debout qu'avec appui des mains, peut lâcher une main",326,31],
+[36,"Marche tenu sous les aisselles ou pousse un déambulateur (bassin en arrière)",329,31],
+[37,"Marche tenu par une seule main",333,50],
+[38,"Marche seul latéral en prenant appui aux meubles (cabotage)",335,32],
+[39,"Se tient debout seul sans appui (au moins 10 s)",361,45],
+[40,"Premiers pas seul (au moins deux)",391,62],
+[41,"Se met debout seul sans appui autre que le sol",432,65],
+[42,"Marche autonome (déambule facilement, demi-tour, polygone de sustentation réduit, membres supérieurs relâchés)",440,66],
+[43,"S'accroupit pour ramasser un jouet",451,61],
+[44,"Grimpe (quadrupédie) sur une estrade (h = 25 cm)",452,34],
+[45,"Monte debout seul sur un plan incliné",456,62],
+[46,"S'assoit seul sur une petite chaise",482,33],
+[47,"Donne un coup de pied dans le ballon sans tomber (démonstration)",511,33],
+[48,"Monte l'escalier avec de l'aide sans changer de pied",514,40],
+[49,"Effectue au moins deux pas en arrière sans tomber (démonstration)",516,54],
+[50,"Tient debout sur un pied, avec l'aide de l'appui d'une main contre le mur (au moins 5 s)",541,33],
+[51,"Descend l'escalier avec de l'aide sans changer de pied",571,32],
+[52,"«Danse» à la demande (se dandine, tourne)",691,32],
+[53,"Course aisée",721,32],
+[54,"Tient debout seul (au moins 5 s) sur une poutre (l : 6 cm ; h : 10 cm)",721,46],
+[55,"Monte et descend l'escalier sans support sans alterner les pieds",723,31],
+[56,"Saute d'une hauteur (20 cm), avec envol en alternant les pieds",811,33],
+[57,"Marche seul (au moins six pas) sur la pointe des pieds (démonstration)",901,32],
+[58,"Saute d'une hauteur (20 cm) les deux pieds symétriques avec envol",901,34],
+[59,"Saute en longueur au sol les deux pieds symétriques avec envol dans un cerceau placé à 35 cm",901,34],
+[60,"Tient seul sur un pied (au moins 2 s)",902,35],
+[61,"Marche sur une ligne (au moins quatre pas consécutifs, démonstration)",935,38],
+[62,"Sautille sur un pied (au moins deux fois)",991,36],
+[63,"Monte seul l'escalier en changeant de pied",1021,61],
+[64,"Pédale sur un tricycle",1083,31],
+[65,"Descend seul l'escalier en changeant de pied",1261,61],
+[66,"Tient seul en équilibre sur un pied (au moins 5 s)",1418,33],
+];
+
+const PCVM=[
+[1,"En décubitus dorsal, les mains s'ouvrent et se ferment avec le pouce en dehors (mouvement giratoire) et mouvement délié des doigts (adduction-abduction)",3,1],
+[2,"Préhension (prise en griffe des quatre doigts) au contact de l'anneau rouge et l'amène dans son champ visuel (oculo-unimanuelle)",74,6],
+[3,"En décubitus dorsal, joue avec ses mains dans le champ visuel de l'axe de son corps et peut les porter à la bouche",105,31],
+[4,"En décubitus dorsal ou maintenu assis, dirige ses mains ensemble vers l'objet présenté dans l'axe médian et saisit, puis manipule des deux mains ou d'une main",130,32],
+[5,"En décubitus dorsal ou maintenu assis, tient un cube donné dans chaque main",164,31],
+[6,"En décubitus dorsal, attrape ses pieds avec ses mains",181,32],
+[7,"En décubitus dorsal ou maintenu assis, porte l'objet à la bouche et le passe d'une main dans l'autre",182,32],
+[8,"Maintenu assis devant une table, saisit un cube entre les deux ou trois derniers doigts pliés sur la paume («prise cubitopalmaire»)",183,32],
+[9,"Maintenu assis devant une table, saisit un cube dans chaque main",195,31],
+[10,"Maintenu assis devant une table, saisit un cube à l'aide du majeur et de l'index replié («prise radiopalmaire»)",211,33],
+[11,"Maintenu assis devant une table, saisit la perle en râtissant («prise palmaire en râteau»)",213,35],
+[12,"Maintenu assis, mange seul un biscuit",230,33],
+[13,"Saisit un cube dans chaque main (prise pouce-index-majeur) et frappe les deux cubes l'un contre l'autre",241,31],
+[14,"Après avoir saisi un cube dans chaque main, lâche l'un des deux cubes pour saisir un troisième cube présenté",242,31],
+[15,"Maintenu assis devant une table, saisit la perle entre le pouce et la face latérale de l'index",242,32],
+[16,"Maintenu assis devant une table, saisit la perle entre la pulpe du pouce et de l'index («pince digitale»)",280,36],
+[17,"Fait les marionnettes, bravo, au revoir (démonstration, 2 sur 3)",285,33],
+[18,"Assis au sol, retire le rond de son trou (planchette, démonstration)",302,31],
+[19,"Assis au sol, capable de dévisser le bouchon d'une petite bouteille (démonstration et amorçage)",342,32],
+[20,"Assis au sol, place l'anneau sur son support (démonstration)",350,38],
+[21,"Assis au sol, saisit le troisième cube présenté en gardant les deux premiers",363,31],
+[22,"Assis, encastre le rond dans son trou (planchette, démonstration)",364,31],
+[23,"Assis au sol, jambes écartées, attrape facilement une balle lancée en roulant au sol (deux réussites sur trois)",365,34],
+[24,"Assis au sol, lance une balle (diam : 15 cm) à une ou deux mains",366,32],
+[25,"Montre du doigt (index) ce qu'il désire",391,32],
+[26,"Assis devant une table, fait une tour de 2 cubes (démonstration)",421,33],
+[27,"Porte une timbale à une ou deux mains à la bouche (démonstration)",422,32],
+[28,"Assis au sol, introduit la perle dans la bouteille (démonstration)",452,32],
+[29,"Assis au sol, retire la perle de la bouteille en la renversant intentionnellement (démonstration)",542,38],
+[30,"Assis devant une table, fait une tour d'au moins trois ou quatre cubes (démonstration)",542,35],
+[31,"Peut manger seul sa purée à la cuillère",554,32],
+[32,"Ferme une fermeture à glissière (cube activité) (démonstration)",585,34],
+[33,"Assis, tourne les pages d'un livre une à une (au moins deux pages successivement)",601,43],
+[34,"Assis devant une table, fait un gribouillage de traits circulaires (démonstration)",669,50],
+[37,"Assis devant une table, trace un trait vertical (≤ 30° de déviation, démonstration)",691,32],
+[38,"Assis devant une table, fait une tour d'au moins six à sept cubes (démonstration)",722,33],
+[39,"Assis devant une table, enfile trois grosses perles sur un lacet (démonstration)",722,33],
+[40,"Assis devant une table, aligne trois ou quatre cubes pour former un train (démonstration)",724,36],
+[41,"Assis, encastre le triangle dans le trou (planchette) (démonstration)",751,33],
+[42,"Déboutonne un gros bouton et reboutonne (cube activité) (démonstration)",850,32],
+[43,"Assis à une table, fait une tour d'au moins huit cubes (démonstration)",871,32],
+[44,"Assis à une table, trace un trait horizontal (≤ 30° de déviation, démonstration)",872,33],
+[45,"Assis à une table, plie une feuille en deux (de 15 cm) (démonstration)",875,58],
+[46,"Assis à une table, dessine avec son crayon bien tenu (prise digitale)",903,32],
+[47,"Debout, lance dans l'axe médian un ballon de 25 cm avec les mains et participation du tronc (deux réussites sur trois)",904,31],
+[48,"Porte un verre d'eau et le pose sur la table sans renverser",908,35],
+[49,"Met seul ses chaussettes, ses chaussons et sa chemise (deux réussites sur trois)",903,34],
+[50,"Lave et essuie seul ses mains (montrer)",963,48],
+[52,"Habille une poupée (pull, pantalon)",1022,48],
+[53,"Commence à utiliser une paire de ciseaux à bouts ronds",1051,35],
+[54,"Assis à une table, copie une croix (modèle)",1081,32],
+[55,"Debout, attrape avec les mains, bras tendus, un ballon lancé en l'air dans l'axe au niveau du thorax (deux réussites sur trois)",1083,31],
+[56,"S'habille presque seul",1143,31],
+[57,"Assis à une table, fait une tour d'au moins dix cubes (démonstration)",1267,40],
+[58,"Boutonne sur soi de gros boutons",1381,66],
+[59,"Utilise la fourchette aisément",1414,36],
+[60,"Debout, attrape avec les mains dans l'axe bras fléchis, un ballon lancé en l'air ou après rebond au sol (deux réussites sur trois)",1416,32],
+[61,"Debout, lance devant soi un ballon de 25 cm de diamètre à 4-5 m (deux réussites sur trois)",1420,34],
+[62,"Assis à une table, copie un carré (modèle)",1442,31],
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+// profiles: [{id,nom,prenom,dob,sessions:[{id,date,pml:{itemId:bool},pcvm:{itemId:bool},notes,orig:{}}]}]
+// ── persistence ──────────────────────────
+const LS_KEY = 'dfmot_profiles_v1';
+function saveProfiles(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(profiles)); } catch(e){}
+}
+function loadProfiles(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw) profiles = JSON.parse(raw);
+  } catch(e){ profiles = []; }
+}
+// ─────────────────────────────────────────
+let profiles = [];
+let curPid=null, curSid=null, curSec='pml';
+let editingSid=null; // null=create mode, sid=edit mode
+const COLORS=['#2563EB','#16A34A','#EA580C','#7C3AED','#0891B2','#DB2777'];
+
+// ── helpers ──
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const d2t=d=>{const m=Math.floor(d/30),j=d%30;return m===0?`${j}j`:j===0?`${m}m`:`${m}m${j}j`;};
+const getP=()=>profiles.find(p=>p.id===curPid);
+const getS=()=>{const p=getP();return p&&p.sessions.find(s=>s.id===curSid);};
+const getData=()=>curSec==='pml'?PML:PCVM;
+
+// ── Age helpers ──────────────────────────────────────────
+// Returns {chrono, corrected, correctionDays} in days, or null if no dob
+// Ecart calendaire entre deux dates ISO (mois entiers + jours restants), pour l'AFFICHAGE des ages.
+// Les calculs (NMF, sigma, courbes) restent en jours, comme les tables DF-MOT.
+function calDiff(fromMs, toMs){
+  const a=new Date(fromMs), b=new Date(toMs);
+  if(b<a) return {m:0,j:0};
+  let m=(b.getUTCFullYear()-a.getUTCFullYear())*12+(b.getUTCMonth()-a.getUTCMonth());
+  const anchor=n=>{const d=Date.UTC(a.getUTCFullYear(),a.getUTCMonth()+n,1);
+    const last=new Date(Date.UTC(a.getUTCFullYear(),a.getUTCMonth()+n+1,0)).getUTCDate();
+    return d+(Math.min(a.getUTCDate(),last)-1)*864e5;};
+  if(anchor(m)>toMs) m--;
+  return {m, j:Math.round((toMs-anchor(m))/864e5)};
+}
+function fmtCal(o){ if(!o) return '?'; return o.m===0?o.j+'j':(o.j===0?o.m+'m':o.m+'m '+o.j+'j'); }
+function fmtCalLong(o){ if(!o) return '?'; if(o.m===0) return o.j+' jours'; return o.j===0?o.m+' mois':o.m+' mois et '+o.j+' jours'; }
+
+function computeAges(profile, evalDate){
+  if(!profile||!profile.dob||!evalDate) return null;
+  const t=new Date(evalDate).getTime(), b=new Date(profile.dob).getTime();
+  if(isNaN(t)||isNaN(b)) return null;
+  const chrono = Math.max(0, Math.round((t-b)/864e5));
+  const saN = profile.sa==null||profile.sa==='' ? NaN : Number(profile.sa);
+  const isPrem = Number.isFinite(saN) && saN>=22 && saN<40;
+  const correctionDays = isPrem ? Math.round((40-saN)*7) : 0;
+  const corrected = Math.max(0, chrono-correctionDays);
+  // Regle DF-MOT : age corrige utilise tant qu'il est < 24 mois (730 j), puis age chronologique
+  const useCorr = isPrem && corrected < 730;
+  const chronoCal = calDiff(b, t);
+  const corrCal = calDiff(b + correctionDays*864e5, t);
+  return {chrono, corrected, correctionDays, isPrem, useCorr, ref: useCorr?corrected:chrono,
+          chronoCal, corrCal, refCal: useCorr?corrCal:chronoCal};
+}
+
+function fmtAge(days){
+  if(days<0) return '0 j';
+  const m=Math.floor(days/30), j=days%30;
+  if(m===0) return j+'j';
+  if(j===0) return m+'m';
+  return m+'m '+j+'j';
+}
+const checked=(sid,sec,id)=>{const p=getP();if(!p)return false;const s=p.sessions.find(x=>x.id===sid);return s&&s[sec]&&s[sec][id]||false;};
+
+// ── brackets (mois par mois) ──
+function buildBrackets(data){
+  const m={};
+  data.forEach(([id,,ag,sd])=>{const k=Math.floor(ag/30);if(!m[k])m[k]=[];m[k].push({id,ag,sd});});
+  return Object.keys(m).map(Number).sort((a,b)=>a-b).map(k=>({k,items:m[k]}));
+}
+function bracketEvaluated(items,secData){
+  // A bracket is "evaluated" if at least one item has been explicitly touched
+  // (secData[id] exists as a key, whether true or false)
+  return items.some(({id})=>id in (secData||{}));
+}
+function bracketOK(items,secData){
+  const tot=items.length;
+  const ok=items.filter(({id})=>secData&&secData[id]===true).length;
+  return ok===tot||(tot>=3&&(tot-ok)<=1);
+}
+function nmf(data,secData){
+  const brackets=buildBrackets(data);
+  // Find brackets that have at least one item explicitly touched (true or false)
+  const touchedBrackets=brackets.filter(b=>bracketEvaluated(b.items,secData));
+  if(!touchedBrackets.length) return null;
+
+  // Determine the evaluation range: from the FIRST touched bracket to the
+  // LAST touched bracket. Any bracket inside this range — even if it has no
+  // items explicitly touched — is treated as "evaluated" (untouched items
+  // inside the range count as failed/false), because the clinician has
+  // necessarily passed over it while evaluating the surrounding brackets.
+  // Brackets outside this range (before the first or after the last touch)
+  // remain transparent (not yet reached by the assessment).
+  const firstKey = touchedBrackets[0].k;
+  const lastKey   = touchedBrackets[touchedBrackets.length-1].k;
+
+  let lastValidated=null;
+  for(const b of brackets){
+    if(b.k < firstKey) continue;       // not yet reached — transparent
+    if(b.k > lastKey) break;            // beyond the evaluated range — stop
+    if(bracketOK(b.items,secData)){
+      lastValidated=b;
+    } else {
+      // This bracket falls within the evaluated range and fails
+      // (whether explicitly touched-and-false, or implicitly skipped) — stop.
+      break;
+    }
+  }
+  if(!lastValidated) return null;
+  const ag=lastValidated.items.reduce((s,x)=>s+x.ag,0)/lastValidated.items.length;
+  const sd=lastValidated.items.reduce((s,x)=>s+x.sd,0)/lastValidated.items.length;
+  return {ag:Math.round(ag),sd:Math.round(sd),bracket:lastValidated};
+}
+
+// ══════════════════════════════════════════
+// PROFILES SCREEN
+// ══════════════════════════════════════════
+function renderProfiles(){
+  const el=document.getElementById('plist');
+  if(!profiles.length){el.innerHTML='<div class="empty">Aucun patient enregistré</div>';return;}
+  el.innerHTML='';
+  profiles.forEach(p=>{
+    const ini=((p.nom[0]||'')+(p.prenom[0]||'')).toUpperCase();
+    const cal=p.dob&&!isNaN(new Date(p.dob))?calDiff(new Date(p.dob).getTime(),Date.now()):null;
+    const ageTxt=cal?(cal.m<24?cal.m+'m':Math.floor(cal.m/12)+'a'):'?';
+    const c=document.createElement('div');c.className='pcard';
+    c.innerHTML=`<div class="avatar">${ini||'?'}</div>
+      <div class="pinfo">
+        <div class="pname">${p.nom} ${p.prenom}</div>
+        <div class="pmeta">Né(e) le ${p.dob?new Date(p.dob).toLocaleDateString('fr-FR'):'-'} &nbsp;·&nbsp; ${ageTxt}</div>
+        <div class="psess">${p.sessions.length} passation${p.sessions.length!==1?'s':''}</div>
+      </div>
+      <button class="del-btn" data-action="deleteProfile" data-pid="${p.id}" title="Supprimer">🗑</button>`;
+    // delete handled by delegation
+    c.onclick=()=>openProfile(p.id);
+    el.appendChild(c);
+  });
+}
+
+// openNewProfile handled by delegation
+function closeOv(id){document.getElementById(id).classList.remove('on');}
+
+function createProfile(){
+  const nom=document.getElementById('mnom').value.trim();
+  const prenom=document.getElementById('mprenom').value.trim();
+  const dob=document.getElementById('mdob').value;
+  const prem=document.getElementById('mprem').checked;
+  const saRaw=document.getElementById('msa').value;
+  const sa=prem&&saRaw?parseInt(saRaw):null; // semaines d'aménorrhée, null if not premature
+  if(!nom&&!prenom){alert('Veuillez saisir au moins un nom.');return;}
+  if(prem&&(!saRaw||sa<24||sa>36)){alert('Veuillez saisir un nombre de SA valide (24-36).'); return;}
+  const p={id:uid(),nom:nom||'—',prenom:prenom||'',dob,sa,sessions:[]};
+  profiles.push(p);
+  saveProfiles();
+  closeOv('ovProfile');
+  renderProfiles();
+  openProfile(p.id);
+}
+function openProfile(id){
+  curPid=id; curSid=null; curSec='pml';
+  const p=getP();
+  document.getElementById('hname').textContent=p.nom+' '+p.prenom;
+  const dobTxt=p.dob?'Né(e) le '+new Date(p.dob).toLocaleDateString('fr-FR'):'DDN non renseignée';
+  const saTxt=p.sa!=null?' — Prématuré(e) à '+p.sa+' SA (correction: '+(40-p.sa)+' sem.)':'';
+  document.getElementById('hdob').textContent=dobTxt+saTxt;
+  document.getElementById('hage').style.display='none'; // updated per session in updateStats
+  document.querySelectorAll('.subtab').forEach(function(t,i){t.classList.toggle('on',i===0);});
+  var nb=document.getElementById('nmfblock'); if(nb) nb.style.display='none';
+  showScreen('scEval');
+  if(!p.sessions.length){
+    addSession(true);
+  } else {
+    curSid=p.sessions[p.sessions.length-1].id;
+    renderAll();
+  }
+}
+function goBack(){showScreen('scProfiles');renderProfiles();}
+
+// ══════════════════════════════════════════
+// SESSIONS
+// ══════════════════════════════════════════
+function renderSessbar(){
+  const p=getP();const bar=document.getElementById('sessbar');bar.innerHTML='';
+  p.sessions.forEach((s,i)=>{
+    const col=COLORS[i%COLORS.length];
+    const isActive=s.id===curSid;
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;align-items:center;border-bottom:3px solid '+(isActive?col:'transparent')+';';
+    // main tab (click to select)
+    const t=document.createElement('div');
+    t.className='stab'+(isActive?' on':'');
+    t.style.borderBottom='none'; // border on wrap instead
+    t.innerHTML=`<span class="sdot" style="background:${col}"></span>Passation ${i+1}<span style="font-size:10px;opacity:.65;margin-left:4px">${s.date?new Date(s.date).toLocaleDateString('fr-FR'):''}</span>`;
+    t.onclick=()=>{curSid=s.id;renderSessbar();renderAll();};
+    wrap.appendChild(t);
+    // edit button
+    const eb=document.createElement('button');
+    eb.title='Modifier la date';
+    eb.style.cssText='background:none;border:none;cursor:pointer;font-size:13px;padding:0 4px 0 0;opacity:.6;line-height:1;';
+    eb.textContent='✏️';
+    eb.onclick=(e)=>{e.stopPropagation();openEditSession(s.id);};
+    wrap.appendChild(eb);
+    // delete button
+    const db=document.createElement('button');
+    db.title='Supprimer cette passation';
+    db.style.cssText='background:none;border:none;cursor:pointer;font-size:13px;padding:0 6px 0 0;opacity:.6;line-height:1;';
+    db.textContent='🗑';
+    db.onclick=(e)=>{e.stopPropagation();deleteSession(s.id);};
+    wrap.appendChild(db);
+    bar.appendChild(wrap);
+  });
+  const ab=document.createElement('button');ab.className='addsbtn';ab.textContent='＋ Passation';
+  ab.onclick=addSession;bar.appendChild(ab);
+}
+
+function addSession(auto){
+  if(auto){
+    const p=getP(); if(!p) return;
+    const s={id:uid(),date:new Date().toISOString().split('T')[0],pml:{},pcvm:{},notes:'',orig:{}};
+    p.sessions.push(s); curSid=s.id;
+    saveProfiles();
+    renderSessbar(); renderAll();
+  } else {
+    editingSid=null;
+    document.getElementById('sdate').value=new Date().toISOString().split('T')[0];
+    document.getElementById('sessModalTitle').textContent='Nouvelle passation';
+    document.getElementById('sessModalBtn').textContent='Créer';
+    document.getElementById('ovSession').classList.add('on');
+  }
+}
+function doCreateSession(){
+  const date=document.getElementById('sdate').value;
+  const p=getP(); if(!p) return;
+  if(editingSid){
+    // edit mode: just update the date
+    const s=p.sessions.find(x=>x.id===editingSid);
+    if(s){ s.date=date; saveProfiles(); }
+    editingSid=null;
+    closeOv('ovSession'); renderSessbar();
+    if(curSid===s.id) updateStats(); // refresh sd display
+  } else {
+    // create mode
+    const s={id:uid(),date,pml:{},pcvm:{},notes:'',orig:{}};
+    p.sessions.push(s); curSid=s.id;
+    saveProfiles();
+    closeOv('ovSession'); renderSessbar(); renderAll();
+  }
+}
+function createSession(){doCreateSession();}
+
+function openEditSession(sid){
+  const p=getP(); if(!p) return;
+  const s=p.sessions.find(x=>x.id===sid); if(!s) return;
+  editingSid=sid;
+  document.getElementById('sdate').value=s.date||new Date().toISOString().split('T')[0];
+  document.getElementById('sessModalTitle').textContent='Modifier la passation';
+  document.getElementById('sessModalBtn').textContent='Enregistrer';
+  document.getElementById('ovSession').classList.add('on');
+}
+
+function deleteSession(sid){
+  const p=getP(); if(!p) return;
+  if(p.sessions.length<=1){alert('Impossible de supprimer la seule passation.');return;}
+  if(!confirm('Supprimer cette passation et toutes ses données ?')) return;
+  p.sessions=p.sessions.filter(x=>x.id!==sid);
+  // if we deleted the active session, switch to last one
+  if(curSid===sid) curSid=p.sessions[p.sessions.length-1].id;
+  saveProfiles();
+  renderSessbar(); renderAll();
+}
+
+// ══════════════════════════════════════════
+// ITEMS LIST  — colonnes = passations
+// ══════════════════════════════════════════
+function buildItems(){
+  const data=getData();const p=getP();
+  const sessions=p?p.sessions:[];
+  const MAX_SESS=6; // show at most 6 session columns
+  const visS=sessions.slice(0,MAX_SESS);
+  const nsess=visS.length;
+
+  // header columns: #, desc, age, sd, then one col per session
+  const sessCols=nsess>0?Array(nsess).fill('38px').join(' '):'38px';
+  const colTpl=`28px 1fr 68px 60px ${sessCols}`;
+  const iheader=document.getElementById('iheader');
+  iheader.style.gridTemplateColumns=colTpl;
+  iheader.innerHTML=`<div>#</div><div>Compétence</div><div style="text-align:center">Âge moy.</div><div style="text-align:center">±σ</div>${visS.map((_,i)=>`<div style="text-align:center;color:${COLORS[i%COLORS.length]}">E${i+1}</div>`).join('')}`;
+
+  const brackets=buildBrackets(data);
+  const panel=document.getElementById('ipanel');panel.innerHTML='';
+
+  let lastMonth=-1,lastGrpEl=null;
+
+  data.forEach(([id,desc,ag,sd])=>{
+    const monthKey=Math.floor(ag/30);
+
+    if(monthKey!==lastMonth){
+      // build bracket status for active session
+      const curSecData=getS()?getS()[curSec]:{};
+      const b=brackets.find(x=>x.k===monthKey);
+      const ok=b?bracketOK(b.items,curSecData):false;
+      const anyEv=b?bracketEvaluated(b.items,curSecData):false;
+      const pass=b?b.items.filter(({id:bid})=>curSecData&&curSecData[bid]===true).length:0;
+      const tot=b?b.items.length:0;
+      let bg='var(--blue-l)',col='var(--blue)',badge='';
+      if(anyEv){bg=ok?'var(--green)':'var(--red-l)';col=ok?'#fff':'var(--red)';badge=`<span class="bbadge">${pass}/${tot}${tot>=3?' (1 toléré)':''}</span>`;}
+      const lbl=monthKey===0?'Naissance':`${monthKey} mois`;
+      const grp=document.createElement('div');grp.className='agroup';
+      grp.innerHTML=`<div class="aglabel" style="background:${bg};color:${col}">${lbl}${badge}</div>`;
+      panel.appendChild(grp);
+      lastMonth=monthKey;lastGrpEl=grp;
+    }
+
+    // row — one checkbox per session
+    const row=document.createElement('div');
+    row.className='irow';
+    row.style.gridTemplateColumns=colTpl;
+    // is the item checked in active session?
+    const s=getS();const actOk=s&&s[curSec]&&s[curSec][id];
+    if(actOk) row.classList.add('ok');
+
+    const sessChecks=visS.map((sess,i)=>{
+      const isActive=sess.id===curSid;
+      const val=sess[curSec]&&sess[curSec][id];
+      const col=COLORS[i%COLORS.length];
+      return `<div class="ichk">
+        <div class="chk${val?' on':''}${!isActive?' dim':''}"
+          data-sid="${sess.id}" data-id="${id}"
+          style="${val?`border-color:${col};background:${col}`:''}"
+          ${isActive?`data-action="toggle" data-sid="${sess.id}" data-iid="${id}"`:''}>
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>`;
+    }).join('');
+
+    row.innerHTML=`<div class="inum">${id}</div>
+      <div class="idesc">${desc}</div>
+      <div class="iage">${d2t(ag)}</div>
+      <div class="isd">±${d2t(sd)}</div>
+      ${sessChecks}`;
+    if(lastGrpEl) lastGrpEl.appendChild(row);
+  });
+}
+
+function toggle(sid,itemId){
+  const p=getP();if(!p)return;
+  const s=p.sessions.find(x=>x.id===sid);if(!s)return;
+  if(!s[curSec]) s[curSec]={};
+  // Store explicit true/false so bracketEvaluated() can detect touched items
+  s[curSec][itemId] = s[curSec][itemId]===true ? false : true;
+  saveProfiles();
+  buildItems();updateStats();drawCurve();
+}
+
+// ══════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════
+function updateStats(){
+  const data=getData();const p=getP();const s=getS();
+  const secData=s?s[curSec]:{};
+  const tot=data.length;
+  const ok=data.filter(([id])=>secData&&secData[id]).length;
+  document.getElementById('sc').textContent=ok;
+  document.getElementById('st').textContent=tot;
+  const pct=Math.round(ok/tot*100);
+  document.getElementById('spct').textContent=pct+'%';
+  document.getElementById('pbf').style.width=pct+'%';
+
+  const r=nmf(data,secData);
+  document.getElementById('nmfv').textContent=r?d2t(r.ag):'—';
+
+  const dob=p&&p.dob?p.dob:null;
+  const dt=s&&s.date?s.date:null;
+  if(dob&&dt&&r){
+    const ca=(new Date(dt)-new Date(dob))/864e5;
+    const diff=r.ag-ca, sv=(diff/r.sd).toFixed(2);
+    const el=document.getElementById('sdv');
+    el.textContent=(diff>=0?'+':'')+sv+' σ';
+    el.className='sdv '+(parseFloat(sv)>=-1?'pos':'neg');
+  } else {
+    const el=document.getElementById('sdv');el.textContent='—';el.className='sdv z';
+  }
+  document.getElementById('notestx').value=s&&s.notes?s.notes:'';
+  document.querySelectorAll('.ocb').forEach(cb=>{cb.checked=s&&s.orig&&s.orig[cb.dataset.k]||false;});
+
+  // Update age display in header for current session
+  const hageEl=document.getElementById('hage');
+  const pr=getP(); const cs=getS();
+  if(pr&&cs&&cs.date&&pr.dob){
+    const ages=computeAges(pr,cs.date);
+    if(ages){
+      const useCorr = ages.useCorr;
+      let ageTxt='Âge réel : '+fmtCal(ages.chronoCal);
+      if(ages.isPrem){
+        ageTxt+=' · Âge corrigé : '+fmtCal(ages.corrCal);
+        ageTxt+=' — Référence utilisée : '+(useCorr?'âge corrigé':'âge réel (≥ 24m corrigés)');
+      }
+      hageEl.textContent=ageTxt;
+      hageEl.style.display='block';
+    } else { hageEl.style.display='none'; }
+  } else { hageEl.style.display='none'; }
+}
+
+function saveNotes(){const s=getS();if(s){s.notes=document.getElementById('notestx').value;saveProfiles();}}
+document.querySelectorAll('.ocb').forEach(cb=>{cb.addEventListener('change',()=>{const s=getS();if(s){if(!s.orig)s.orig={};s.orig[cb.dataset.k]=cb.checked;saveProfiles();}});});
+
+// ══════════════════════════════════════════
+// CURVE — fidèle au document original
+// ══════════════════════════════════════════
+const _curveCache = {};
+let _curveRaf = 0;
+function drawCurve(){
+  if (_curveRaf) return;
+  _curveRaf = requestAnimationFrame(function(){ _curveRaf = 0; drawCurveNow(); });
+}
+function drawCurveNow(){
+  // Guard: only run when eval screen is visible and canvases exist
+  if (!document.getElementById('cvs1')) return;
+  const p = getP();
+  // Define the two sub-ranges per section
+  const RANGES = {
+    pml:  [{ids:[1,39],  minM:0,  maxM:15, title:"PML — 0 à 14 mois (items 1–39)",  cvs:"cvs1", leg:"leg1", ttl:"curveTitle1"},
+           {ids:[40,66], minM:12, maxM:51, title:"PML — 12 à 50 mois (items 40–66)", cvs:"cvs2", leg:"leg2", ttl:"curveTitle2"}],
+    pcvm: [{ids:[1,24],  minM:0,  maxM:15, title:"PCVM — 0 à 14 mois (items 1–24)",  cvs:"cvs1", leg:"leg1", ttl:"curveTitle1"},
+           {ids:[25,62], minM:12, maxM:51, title:"PCVM — 12 à 50 mois (items 25–62)",cvs:"cvs2", leg:"leg2", ttl:"curveTitle2"}],
+  };
+  const ranges = RANGES[curSec] || RANGES.pml;
+  const allData = curSec === 'pml' ? PML : PCVM;
+
+  ranges.forEach(range => {
+    // Filter data to this range
+    const data = allData.filter(d => d[0] >= range.ids[0] && d[0] <= range.ids[1]);
+    if (!data.length) return;
+
+    document.getElementById(range.ttl).textContent = range.title;
+
+    const cvs = document.getElementById(range.cvs);
+    const ctx  = cvs.getContext('2d');
+    const W    = cvs.offsetWidth || 380;
+    const H    = 380;
+    cvs.style.height = H + 'px';
+    const dprC = window.devicePixelRatio || 1;
+    cvs.width  = Math.round(W * dprC);
+    cvs.height = Math.round(H * dprC);
+    ctx.scale(dprC, dprC);
+
+    const PAD = {t:22, r:16, b:44, l:32};
+    const pw  = W - PAD.l - PAD.r;
+    const ph  = H - PAD.t - PAD.b;
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+
+    const nI    = data.length;
+    const minAg = range.minM * 30;
+    const maxAg = range.maxM * 30;
+
+    const xC = a => PAD.l + ((Math.min(Math.max(a, minAg), maxAg) - minAg) / (maxAg - minAg)) * pw;
+    const yC = i => PAD.t + ph - (i / (nI - 1)) * ph;
+
+    // Couche statique (grille, couloir, courbe de reference) mise en cache : seule la couche
+    // dynamique (passations, NMF, age) est redessinee a chaque modification.
+    const paintStatic = ctx => {
+      // ── vertical grid ──
+      const totalM = range.maxM - range.minM;
+      const step = totalM <= 16 ? 1 : totalM <= 30 ? 2 : 4;
+      ctx.font = '9px Inter,system-ui'; ctx.textAlign = 'center';
+      for (let m = range.minM; m <= range.maxM; m += step) {
+        const x = xC(m * 30);
+        ctx.strokeStyle = '#d4d4d4'; ctx.lineWidth = 0.8; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, PAD.t + ph); ctx.stroke();
+        ctx.fillStyle = '#555';
+        ctx.fillText(m, x, PAD.t + ph + 13);
+      }
+      ctx.fillStyle = '#333'; ctx.font = 'bold 9px Inter,system-ui';
+      ctx.fillText('NOMBRE DE MOIS', PAD.l + pw / 2, H - 2);
+
+      // ── horizontal grid ──
+      data.forEach((_, i) => {
+        ctx.strokeStyle = '#ebebeb'; ctx.lineWidth = 0.5; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(PAD.l, yC(i)); ctx.lineTo(PAD.l + pw, yC(i)); ctx.stroke();
+      });
+
+      // ── Y axis item numbers ──
+      const every = nI > 30 ? 5 : nI > 15 ? 2 : 1;
+      ctx.textAlign = 'right'; ctx.font = '8px Inter,system-ui'; ctx.fillStyle = '#666';
+      data.forEach(([id], i) => {
+        if (i === 0 || i === nI-1 || i % every === 0) ctx.fillText(id, PAD.l - 3, yC(i) + 3);
+      });
+
+      // ── ±1σ corridor ──
+      ctx.beginPath();
+      data.forEach(([,,ag,sd], i) => {
+        const x = xC(Math.min(ag + sd, maxAg)), y = yC(i);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      for (let i = nI-1; i >= 0; i--) {
+        const [,,ag,sd] = data[i];
+        ctx.lineTo(xC(Math.max(ag - sd, minAg)), yC(i));
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(150,150,190,0.17)'; ctx.fill();
+      ['upper','lower'].forEach(edge => {
+        ctx.beginPath();
+        data.forEach(([,,ag,sd], i) => {
+          const x = edge==='upper' ? xC(Math.min(ag+sd,maxAg)) : xC(Math.max(ag-sd,minAg));
+          i === 0 ? ctx.moveTo(x, yC(i)) : ctx.lineTo(x, yC(i));
+        });
+        ctx.strokeStyle = 'rgba(110,110,170,0.30)'; ctx.lineWidth = 0.8; ctx.stroke();
+      });
+
+      // ── reference diagonal ──
+      ctx.beginPath();
+      data.forEach(([,,ag], i) => { i===0?ctx.moveTo(xC(ag),yC(i)):ctx.lineTo(xC(ag),yC(i)); });
+      ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.8; ctx.setLineDash([]); ctx.stroke();
+      data.forEach(([,,ag], i) => {
+        ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(xC(ag),yC(i),3.5,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.stroke();
+      });
+
+    };
+    const dpr = window.devicePixelRatio || 1;
+    const key = curSec + '|' + range.cvs + '|' + W + '|' + dpr;
+    let layer = _curveCache[key];
+    if (!layer) {
+      layer = document.createElement('canvas');
+      layer.width = cvs.width; layer.height = cvs.height;
+      const lc = layer.getContext('2d');
+      lc.scale(dpr, dpr);
+      lc.fillStyle = '#fff'; lc.fillRect(0, 0, W, H);
+      paintStatic(lc);
+      _curveCache[key] = layer;
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(layer, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // ── sessions ──
+    const legEl   = document.getElementById(range.leg);
+    legEl.innerHTML = '';
+    const sessions = p ? p.sessions : [];
+    const trajPts  = [];
+
+    sessions.forEach((s, si) => {
+      const col     = COLORS[si % COLORS.length];
+      const secData = s[curSec] || {};
+      const sAges   = p ? computeAges(p, s.date || '') : null;
+      const sAgeDays = sAges ? sAges.ref : null;
+      if (sAgeDays == null) return;
+
+      const dotX = xC(sAgeDays);
+
+      // Find the HIGHEST validated bracket in this range
+      const rangeData = data; // already filtered
+      const r = nmf(rangeData, secData);
+
+      if (r) {
+        // Get the last item of the NMF bracket to determine Y
+        const bracketIds = r.bracket.items.map(x => x.id);
+        // Find highest index in rangeData that belongs to this bracket
+        let highIdx = -1;
+        rangeData.forEach(([id], i) => { if (bracketIds.includes(id)) highIdx = i; });
+        if (highIdx >= 0) {
+          const dotY = yC(highIdx);
+          // Draw single dot at child's age X, NMF bracket Y
+          ctx.fillStyle   = col;
+          ctx.beginPath(); ctx.arc(dotX, dotY, 7, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+          // Inner label: session number
+          ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Inter,system-ui'; ctx.textAlign = 'center';
+          ctx.fillText(si + 1, dotX, dotY + 3);
+
+          trajPts.push({x: dotX, y: dotY, col, si});
+
+          // NMF vertical dashed line if calculated
+          if (s._nmfCalculated) {
+            const xn = xC(r.ag);
+            ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+            ctx.beginPath(); ctx.moveTo(xn, PAD.t); ctx.lineTo(xn, PAD.t + ph); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = col; ctx.font = 'bold 8px Inter,system-ui'; ctx.textAlign = 'center';
+            ctx.fillText('NMF', xn, PAD.t + 8 + si * 10);
+            // Horizontal arrow NMF → child age
+            if (Math.abs(dotX - xn) > 4) {
+              const midY = dotY - 14;
+              ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.setLineDash([3, 2]);
+              ctx.globalAlpha = 0.65;
+              ctx.beginPath(); ctx.moveTo(xn, midY); ctx.lineTo(dotX, midY); ctx.stroke();
+              ctx.setLineDash([]); ctx.globalAlpha = 1;
+              const dir = dotX > xn ? 1 : -1;
+              ctx.fillStyle = col; ctx.globalAlpha = 0.75;
+              ctx.beginPath();
+              ctx.moveTo(dotX, midY);
+              ctx.lineTo(dotX - dir*7, midY - 3);
+              ctx.lineTo(dotX - dir*7, midY + 3);
+              ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+              const diffM = Math.round(Math.abs(r.ag - sAgeDays) / 30);
+              if (diffM > 0) {
+                ctx.fillStyle = col; ctx.font = 'bold 8px Inter,system-ui'; ctx.textAlign = 'center';
+                ctx.fillText((dotX > xn ? '+' : '-') + diffM + 'm', (xn + dotX) / 2, midY - 4);
+              }
+            }
+          }
+        }
+      }
+
+      // Legend
+      const li = document.createElement('div'); li.className = 'li';
+      li.innerHTML = '<div class="ld" style="background:' + col + '"></div>' +
+        'Passation ' + (si+1) + (s.date ? ' – ' + new Date(s.date).toLocaleDateString('fr-FR') : '');
+      legEl.appendChild(li);
+    });
+
+    // ── Trajectory between sessions ──
+    if (trajPts.length >= 2) {
+      for (let k = 0; k < trajPts.length - 1; k++) {
+        const p1 = trajPts[k], p2 = trajPts[k+1];
+        const grad = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+        grad.addColorStop(0, p1.col); grad.addColorStop(1, p2.col);
+        ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        // Arrow at p2
+        const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        ctx.fillStyle = p2.col; ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(p2.x, p2.y);
+        ctx.lineTo(p2.x - 9*Math.cos(angle-0.4), p2.y - 9*Math.sin(angle-0.4));
+        ctx.lineTo(p2.x - 9*Math.cos(angle+0.4), p2.y - 9*Math.sin(angle+0.4));
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+      }
+    }
+
+    // ── Child's age vertical line ──
+    const cs = getS();
+    if (cs && cs.date && p && p.dob) {
+      const ages = computeAges(p, cs.date);
+      const useCorr = !!(ages && ages.useCorr);
+      const refAge = ages ? ages.ref : null;
+      if (refAge != null && refAge >= minAg && refAge <= maxAg) {
+        const xa = xC(refAge);
+        ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+        ctx.beginPath(); ctx.moveTo(xa, PAD.t); ctx.lineTo(xa, PAD.t + ph); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e11d48'; ctx.font = 'bold 8px Inter,system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(useCorr ? 'Â.corrigé' : 'Âge', xa, PAD.t + ph + 28);
+      }
+    }
+
+    // Static legend
+    const lsig = document.createElement('div'); lsig.className = 'li';
+    lsig.innerHTML = '<div style="width:14px;height:9px;background:rgba(150,150,190,.3);border-radius:2px;border:1px solid rgba(110,110,170,.35)"></div> ±1σ';
+    legEl.appendChild(lsig);
+  });
+}
+
+
+// ══════════════════════════════════════════
+// CALCUL NMF
+// ══════════════════════════════════════════
+function calcNMF(){
+  const data    = getData();
+  const p       = getP();
+  const s       = getS();
+  const secData = s ? s[curSec] : {};
+  const r       = nmf(data, secData);
+  const block   = document.getElementById('nmfblock');
+  block.style.display = 'block';
+
+  if (!r) {
+    document.getElementById('nmfv').textContent    = 'Aucune tranche validee';
+    document.getElementById('sdv').textContent     = '--';
+    document.getElementById('sdv').className       = 'sdv z';
+    document.getElementById('nmfdetail').innerHTML = '<em>Aucune tranche validee. Cochez les items acquis.</em>';
+    drawCurve();
+    return;
+  }
+
+  if (s) s._nmfCalculated = true;
+
+  const nmfM = Math.floor(r.ag / 30), nmfJ = r.ag % 30;
+  const nmfLabel = nmfJ > 0 ? (nmfM + ' mois ' + nmfJ + ' j') : (nmfM + ' mois');
+  document.getElementById('nmfv').textContent = nmfLabel;
+
+  const dob = p && p.dob ? p.dob : null;
+  const dt  = s && s.date ? s.date : null;
+  const bracketItems = r.bracket.items;
+  const passedItems  = bracketItems.filter(function(it){ return secData[it.id]; });
+  const skipped      = bracketItems.filter(function(it){ return !secData[it.id]; });
+
+  var detail = '<b>Derniere tranche validee :</b> mois ' + r.bracket.k + ' -> age moyen <b>' + nmfLabel + '</b><br>';
+  detail    += '<b>Items de la tranche :</b> ' + passedItems.length + '/' + bracketItems.length + ' reussis';
+  if (skipped.length) detail += ' (item' + (skipped.length>1?'s':'') + ' ' + skipped.map(function(x){return x.id;}).join(', ') + ' tolere' + (skipped.length>1?'s':'') + ')';
+  detail    += '<br><b>Ecart-type de reference :</b> +/-' + d2t(r.sd) + '<br>';
+
+  if (dob && dt) {
+    var ages   = computeAges(p, dt);
+    if (!ages) { document.getElementById('sdv').textContent='Dates invalides'; document.getElementById('sdv').className='sdv z'; document.getElementById('nmfdetail').innerHTML=detail+'<em>Date de naissance ou date de passation invalide.</em>'; drawCurve(); return; }
+    var ca     = ages.chrono;
+    var caRef  = ages.ref;
+    var diff   = r.ag - caRef;
+    var sv     = diff / r.sd;
+    var svStr  = (sv >= 0 ? '+' : '') + sv.toFixed(2);
+    var el     = document.getElementById('sdv');
+    el.textContent = svStr + ' s';
+    el.className   = 'sdv ' + (sv >= -1 ? 'pos' : 'neg');
+    var useCorr = ages.useCorr;
+    detail += '<b>Age reel :</b> ' + fmtCal(ages.chronoCal);
+    if (ages && ages.isPrem) {
+      detail += ' - <b>Age corrige :</b> ' + fmtCal(ages.corrCal);
+      detail += ' <em>(ref: ' + (useCorr ? 'age corrige (<24m)' : 'age reel (>=24m)') + ')</em><br>';
+    } else { detail += '<br>'; }
+    detail += '<b>Ecart NMF / age ref :</b> ' + fmtAge(Math.abs(diff)) + ' ';
+    detail += diff >= 0 ? "d'avance" : 'de retard';
+    detail += '<br><b>Resultat :</b> NMF ' + svStr + ' s -- ';
+    detail += sv >= -1 && sv <= 1
+      ? '<span style="color:#16A34A;font-weight:700">dans la norme</span>'
+      : sv > 1
+        ? '<span style="color:#2563EB;font-weight:700">en avance</span>'
+        : '<span style="color:#DC2626;font-weight:700">en retard</span>';
+  } else {
+    document.getElementById('sdv').textContent = 'DDN / date manquante';
+    document.getElementById('sdv').className   = 'sdv z';
+    detail += '<em>Ajoutez la DDN et la date pour calculer.</em>';
+  }
+  document.getElementById('nmfdetail').innerHTML = detail;
+  drawCurve();
+}
+
+// ══════════════════════════════════════════
+// EXPORT / IMPORT (AES-GCM via WebCrypto)
+// ══════════════════════════════════════════
+var _pwdMode = null;
+var _importRaw = null;
+
+async function deriveKey(password, salt) {
+  var enc = new TextEncoder();
+  var keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt:salt, iterations:200000, hash:'SHA-256'},
+    keyMat, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
+  );
+}
+
+async function encryptData(password, plaintext) {
+  var salt = crypto.getRandomValues(new Uint8Array(16));
+  var iv   = crypto.getRandomValues(new Uint8Array(12));
+  var key  = await deriveKey(password, salt);
+  var enc  = new TextEncoder();
+  var ct   = await crypto.subtle.encrypt({name:'AES-GCM', iv:iv}, key, enc.encode(plaintext));
+  var buf  = new Uint8Array(16 + 12 + ct.byteLength);
+  buf.set(salt, 0); buf.set(iv, 16); buf.set(new Uint8Array(ct), 28);
+  return btoa(String.fromCharCode.apply(null, buf));
+}
+
+async function decryptData(password, b64) {
+  var buf  = Uint8Array.from(atob(b64), function(ch){ return ch.charCodeAt(0); });
+  var salt = buf.slice(0, 16);
+  var iv   = buf.slice(16, 28);
+  var ct   = buf.slice(28);
+  var key  = await deriveKey(password, salt);
+  var pt   = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, key, ct);
+  return new TextDecoder().decode(pt);
+}
+
+function openExport() {
+  _pwdMode = 'export';
+  document.getElementById('pwdTitle').textContent      = 'Exporter les donnees';
+  document.getElementById('pwdDesc').textContent       = 'Choisissez un mot de passe pour chiffrer vos donnees. Conservez-le — sans lui les donnees seront inaccessibles.';
+  document.getElementById('pwdHint').textContent       = 'Le fichier exporte sera illisible sans ce mot de passe.';
+  document.getElementById('pwdConfirmBtn').textContent = 'Exporter';
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('ovPwd').classList.add('on');
+  setTimeout(function(){ document.getElementById('pwdInput').focus(); }, 50);
+}
+
+function openImport() {
+  document.getElementById('importFile').click();
+}
+
+async function doExport(password) {
+  if (!password) { alert('Veuillez saisir un mot de passe.'); return; }
+  try {
+    var json      = JSON.stringify({v:1, profiles:profiles});
+    var encrypted = await encryptData(password, json);
+    var payload   = JSON.stringify({dfmot:true, v:1, data:encrypted});
+    var blob = new Blob([payload], {type:'application/json'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    var ts   = new Date().toISOString().slice(0,10);
+    a.href = url; a.download = 'dfmot_' + ts + '.json';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    closeOv('ovPwd');
+    alert('Export reussi. Conservez ce fichier et votre mot de passe.');
+  } catch(e) {
+    alert('Erreur export : ' + e.message);
+  }
+}
+
+async function doImport(password) {
+  if (!password || !_importRaw) { alert('Mot de passe manquant.'); return; }
+  try {
+    var parsed = JSON.parse(_importRaw);
+    if (!parsed.dfmot) throw new Error('Fichier non reconnu.');
+    var json = await decryptData(password, parsed.data);
+    var obj  = JSON.parse(json);
+    if (!obj.profiles) throw new Error('Structure invalide.');
+    var n = obj.profiles.length;
+    if (!confirm('Importer ' + n + ' patient' + (n>1?'s':'') + ' ? Les patients existants ne seront pas ecrases.')) return;
+    var existingIds = new Set(profiles.map(function(p){ return p.id; }));
+    var added = 0;
+    obj.profiles.forEach(function(p) {
+      if (!existingIds.has(p.id)) { profiles.push(p); added++; }
+    });
+    saveProfiles();
+    closeOv('ovPwd');
+    _importRaw = null;
+    renderProfiles();
+    alert('Import reussi : ' + added + ' patient' + (added>1?'s':'') + ' ajoute' + (added>1?'s':'') + '.');
+  } catch(e) {
+    if (e.name === 'OperationError') alert('Mot de passe incorrect.');
+    else alert('Erreur : ' + e.message);
+  }
+}
+
+async function pwdConfirm() {
+  var pwd = document.getElementById('pwdInput').value;
+  if (_pwdMode === 'export') await doExport(pwd);
+  else if (_pwdMode === 'import') await doImport(pwd);
+}
+
+document.getElementById('importFile').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    _importRaw = ev.target.result;
+    _pwdMode = "import";
+    document.getElementById("pwdTitle").textContent   = "Importer les donnees";
+    document.getElementById("pwdDesc").textContent    = "Saisissez le mot de passe utilise lors de l'export.";
+    document.getElementById("pwdHint").textContent    = "Fichier : " + file.name;
+    document.getElementById("pwdConfirmBtn").textContent = "Importer";
+    document.getElementById("pwdInput").value = "";
+    document.getElementById("ovPwd").classList.add("on");
+    setTimeout(function(){ document.getElementById("pwdInput").focus(); }, 50);
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+
+// ══════════════════════════════════════════
+// COMPTE RENDU
+// ══════════════════════════════════════════
+function generateReport() {
+  var p = getP(), s = getS();
+  if (!p || !s) return;
+
+  var lines = [];
+  var sep = '\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014';
+
+  // Gender neutral — use first name to guess, default to neutral phrasing
+  var prenom = p.prenom || '';
+  // We use "l'enfant" throughout — clinically neutral
+  var sujet = "L'enfant";
+
+  // ── En-tete ──
+  var headerParts = [];
+  headerParts.push(p.nom + ' ' + p.prenom);
+  if (p.dob) {
+    headerParts.push('né(e) le ' + new Date(p.dob).toLocaleDateString('fr-FR'));
+    if (p.sa != null) headerParts.push('prématuré(e) à ' + p.sa + ' SA');
+  }
+  if (s.date) {
+    headerParts.push('évalué(e) le ' + new Date(s.date).toLocaleDateString('fr-FR'));
+    if (p.dob) {
+      var ages = computeAges(p, s.date);
+      if (ages) {
+        var ageLabel = ages.useCorr
+          ? 'âge corrigé ' + fmtCalLong(ages.corrCal)
+          : 'âge ' + fmtCalLong(ages.chronoCal);
+        headerParts.push(ageLabel);
+      }
+    }
+  }
+  lines.push(headerParts.join(' — '));
+  lines.push('');
+
+  // ── Sections ──
+  var sections = [
+    {key:'pml',  label:'Développement Posturo-Moteur et Locomoteur (PML)', data:PML},
+    {key:'pcvm', label:'Préhension-Coordination Visuo-Manuelle (PCVM)',     data:PCVM},
+  ];
+
+  sections.forEach(function(sec) {
+    var secData = s[sec.key] || {};
+    var data    = sec.data;
+    var anyChecked = data.some(function(d){ return secData[d[0]] === true; });
+    if (!anyChecked) return;
+
+    lines.push(sep);
+    lines.push(sec.label);
+    lines.push('');
+
+    var r = nmf(data, secData);
+
+    // ── NMF + ecart-type en une phrase ──
+    if (r) {
+      var nmfM = Math.floor(r.ag / 30), nmfJ = r.ag % 30;
+      var nmfLabel = nmfJ > 0 ? (nmfM + ' mois ' + nmfJ + ' jours') : (nmfM + ' mois');
+      var nmfSentence = 'Le niveau moteur fonctionnel (NMF) est de ' + nmfLabel + '.';
+
+      var ages2  = (p.dob && s.date) ? computeAges(p, s.date) : null;
+      if (ages2) {
+        var caRef  = ages2 ? ages2.ref : null;
+        var diff   = r.ag - caRef;
+        var sv     = diff / r.sd;
+        var svStr  = (sv >= 0 ? '+' : '') + sv.toFixed(2);
+        var concl  = sv >= -1 && sv <= 1
+          ? 'correspondant à une acquisition dans la norme'
+          : sv > 1
+            ? 'témoignant d\'acquisitions en avance sur la norme'
+            : 'témoignant d\'un retard par rapport à la norme';
+        var ageRefLabel = (ages2.useCorr)
+          ? 'l\'âge corrigé (' + fmtCalLong(ages2.refCal) + ')'
+          : 'l\'âge chronologique (' + fmtCalLong(ages2.refCal) + ')';
+        nmfSentence += ' Cela représente un écart de ' + svStr + '\u03C3 par rapport à ' + ageRefLabel + ', ' + concl + '.';
+      }
+      lines.push(nmfSentence);
+      lines.push('');
+    }
+
+    // ── Acquisitions : une phrase par tranche ──
+    var brackets = buildBrackets(data);
+    var lastValidBk = null;
+    for (var bi = 0; bi < brackets.length; bi++) {
+      if (bracketEvaluated(brackets[bi].items, secData) && bracketOK(brackets[bi].items, secData)) {
+        lastValidBk = brackets[bi];
+      } else if (bracketEvaluated(brackets[bi].items, secData)) {
+        break;
+      }
+    }
+
+    if (lastValidBk) {
+      // Collect all validated brackets (consecutive)
+      var validBrackets = [];
+      for (var bi2 = 0; bi2 < brackets.length; bi2++) {
+        if (bracketEvaluated(brackets[bi2].items, secData) && bracketOK(brackets[bi2].items, secData)) {
+          validBrackets.push(brackets[bi2]);
+        } else if (bracketEvaluated(brackets[bi2].items, secData)) {
+          break;
+        }
+      }
+
+      // Collect ALL passed items across all validated brackets into one flat list
+      var allDescs = [];
+      var toleranceNotes = [];
+      validBrackets.forEach(function(b) {
+        var passed  = b.items.filter(function(it){ return secData[it.id] === true; });
+        var skipped = b.items.filter(function(it){ return !secData[it.id]; });
+        passed.forEach(function(it) {
+          var d = data.find(function(x){ return x[0] === it.id; });
+          if (d) allDescs.push(shortenItem(d[1]));
+        });
+        if (skipped.length && b.items.length >= 3) {
+          var sk = skipped.map(function(it){ return 'item ' + it.id; });
+          var mLbl = b.k === 0 ? 'naissance' : b.k + ' mois';
+          toleranceNotes.push(sk.join(', ') + ' (' + mLbl + ')');
+        }
+      });
+
+      if (allDescs.length > 0) {
+        lines.push(sujet + " est capable de " + joinList(allDescs) + ".");
+        if (toleranceNotes.length) {
+          lines.push("(Tolérance appliquée : " + toleranceNotes.join(' ; ') + " non réalisé dans la tranche)");
+        }
+        lines.push('');
+      }
+    }
+
+    // ── Items non acquis (trous dans la sequence) ──
+    var gapItems = [];
+    if (lastValidBk) {
+      brackets.forEach(function(b) {
+        if (b.k > lastValidBk.k) return;
+        if (!bracketEvaluated(b.items, secData)) return;
+        b.items.forEach(function(it) {
+          if (secData[it.id] !== true) {
+            var d = data.find(function(x){ return x[0]===it.id; });
+            if (d) gapItems.push({id:it.id, k:b.k, desc:d[1]});
+          }
+        });
+      });
+    }
+    if (gapItems.length > 0) {
+      var gapDescs = gapItems.map(function(g){ return shortenItem(g.desc); }).filter(Boolean);
+      lines.push('On note cependant que ' + sujet.toLowerCase() + ' ne réalise pas encore certains items des tranches validées : ' + joinList(gapDescs) + '. Ces éléments méritent d\'être explorés.');
+      lines.push('');
+    }
+
+    // ── Prochaine etape ──
+    if (lastValidBk) {
+      var nextBks = brackets.filter(function(b){ return b.k > lastValidBk.k; });
+      if (nextBks.length > 0) {
+        var next = nextBks[0];
+        var unacq = next.items.filter(function(it){ return secData[it.id] !== true; });
+        if (unacq.length > 0) {
+          var nextDescs = unacq.map(function(it){
+            var d = data.find(function(x){ return x[0]===it.id; });
+            return d ? shortenItem(d[1]) : '';
+          }).filter(Boolean);
+          var mLabelNext = next.k === 0 ? 'de la naissance' : 'de ' + next.k + ' mois';
+          lines.push('Les acquisitions de la tranche ' + mLabelNext + ' ne sont pas encore consolidées : ' + sujet.toLowerCase() + ' ne réalise pas encore ' + joinList(nextDescs) + '.');
+          lines.push('');
+        }
+      }
+    }
+  });
+
+  // ── Tonus ──
+  var tonus = s.tonus || {};
+  var tonusLines = [];
+  var tonusMap = {
+    'foulard_val':        {lbl:'Le signe du foulard',         vals:{'cont_far':'inférieur à la ligne mammaire controlatérale','cont_line':'à la ligne mammaire controlatérale','mediane':'entre la ligne médiane et la ligne mammaire controlatérale','juste_med':'juste à la ligne médiane','homo':'entre la ligne médiane et la ligne mammaire homolatérale'}},
+    'talon_oreille_val':  {lbl:'Le talon-oreille',            vals:{'180_150':'180°-150°','150_130':'150°-130°','130_110':'130°-110°','110':'110°','100':'100°','90':'90°'}},
+    'angle_poplite_val':  {lbl:"L'angle poplité",             vals:{'180_150':'180°-150°','150_130':'150°-130°','130_110':'130°-110°','110':'110°','100':'100°','90_80':'90°-80°'}},
+    'adducteurs_val':     {lbl:'Les adducteurs',              vals:{'150_130':'150°-130°','130_100':'130°-100°','100_80':'100°-80°','80_60':'80°-60°'}},
+    'dorsiflexion_val':   {lbl:'La dorsiflexion du pied',     vals:{'40p':'>= 40°','40_30':'40°-30°','20_10':'20°-10°','0':'0°'}},
+    'tire_assis_axial':   {lbl:'Au tiré-assis axial',         vals:{'ta_rien':'aucune participation','ta_tete':'participation de la tête','ta_tete_ep':'participation tête et épaules'}},
+    'tire_assis_lat':     {lbl:'Au tiré-assis latéral',       vals:{'tal_oui':'participation des bras présente','tal_non':'absence de participation des bras','tal_asy':'asymétrie de participation des bras'}},
+    'retournements':      {lbl:'Aux retournements',            vals:{'ret_oui':'participation active','ret_part':'participation partielle','ret_non':'absence de participation'}},
+  };
+
+  Object.keys(tonusMap).forEach(function(k) {
+    var v = tonus[k]; if (!v) return;
+    var entry = tonusMap[k];
+    var vLabel = entry.vals[v] || v;
+    var line = entry.lbl + ' : ' + vLabel + '.';
+    // Ajout des qualificatifs Limité/Exagéré D/G
+    var prefix = k.replace('_val','').replace('_axial','').replace('_lat','');
+    var sides = [];
+    ['d','g'].forEach(function(side) {
+      var lbl = side==='d'?'D':'G';
+      if (tonus[prefix+'_'+side+'_p1']) sides.push('limité à ' + lbl);
+      if (tonus[prefix+'_'+side+'_p2']) sides.push('exagéré à ' + lbl);
+    });
+    if (sides.length) line += ' (' + sides.join(', ') + ')';
+    // Stretch for dorsiflexion
+    if (k === 'dorsiflexion_val') {
+      var stretches = [];
+      if (tonus['dorsiflexion_stretch_d']) stretches.push('stretch positif à droite');
+      if (tonus['dorsiflexion_stretch_g']) stretches.push('stretch positif à gauche');
+      if (stretches.length) line += ' — ' + stretches.join(', ') + '.';
+    }
+    tonusLines.push(line);
+  });
+
+  if (tonusLines.length > 0) {
+    lines.push(sep);
+    lines.push('Tonus passif et actif');
+    lines.push('');
+    lines.push('Concernant le tonus, on note les éléments suivants : ' + tonusLines.join(' ') );
+    if (tonus.notes && tonus.notes.trim()) lines.push(tonus.notes.trim());
+    lines.push('');
+  }
+
+  // ── Observations ──
+  if (s.notes && s.notes.trim()) {
+    lines.push(sep);
+    lines.push('Observations');
+    lines.push('');
+    lines.push(s.notes.trim());
+    lines.push('');
+  }
+
+  // ── Origine probable ──
+  var orig = s.orig || {};
+  var origLabels = {gen:'génétique',cen:'centrale',per:'périphérique',pos:'posturale ostéomusculaire',psy:'psycho-affective',aut:'autre'};
+  var origSelected = Object.keys(orig).filter(function(k){ return orig[k]; }).map(function(k){ return origLabels[k]||k; });
+  if (origSelected.length) {
+    lines.push(sep);
+    lines.push("L'origine de ce profil moteur pourrait être " + joinList(origSelected) + '.');
+    lines.push('');
+  }
+
+  // Anamnese in report if present
+  var an = s.anamnese || {};
+  var anFields = [
+    {key:'motif', label:'Motif de consultation'},
+    {key:'demande_parents', label:'Demande des parents'},
+    {key:'grossesse', label:'Grossesse'},
+    {key:'naissance', label:'Naissance / périnatal'},
+    {key:'atcd_medicaux', label:'Antécédents médicaux'},
+    {key:'traitements', label:'Traitements en cours'},
+    {key:'dev_moteur', label:'Développement moteur'},
+    {key:'dev_langage', label:'Développement du langage'},
+    {key:'famille', label:'Famille'},
+    {key:'mode_garde', label:'Mode de garde / scolarité'},
+    {key:'suivi', label:'Suivis en cours'},
+    {key:'comportement', label:'Comportement rapporté'},
+    {key:'anamnese_notes', label:'Notes'},
+  ];
+  var hasAn = anFields.some(function(f){ return an[f.key] && an[f.key].trim(); });
+  if (hasAn) {
+    lines.push(sep);
+    lines.push('ANAMNÈSE');
+    lines.push('');
+    anFields.forEach(function(f) {
+      if (an[f.key] && an[f.key].trim()) lines.push(f.label + ' : ' + an[f.key].trim());
+    });
+    lines.push('');
+  }
+
+  lines.push(sep);
+  lines.push("Bilan réalisé à l'aide de l'outil DF-MOT (Vaivre-Douret, 1997)");
+
+  document.getElementById('reportText').value = lines.join('\n');
+  document.getElementById('reportCopied').style.display = 'none';
+  document.getElementById('ovReport').classList.add('on');
+}
+
+// Converts an item description to a short lowercase infinitive form
+function shortenItem(desc) {
+  if (!desc) return '';
+  // Remove parenthetical qualifiers to keep it short
+  var s = desc
+    .replace(/\(au moins [^)]+\)/gi, '')
+    .replace(/\(à[^)]*\)/gi, '')
+    .replace(/\([^)]*cm[^)]*\)/gi, '')
+    .replace(/\([^)]*s\)/gi, '')
+    .replace(/\([^)]*fois[^)]*\)/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  // Lowercase first letter
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+function joinList(arr) {
+  if (!arr.length) return '';
+  if (arr.length === 1) return arr[0];
+  return arr.slice(0, -1).join(', ') + ' et ' + arr[arr.length - 1];
+}
+
+
+function fmtAgeLong(days) {
+  var m = Math.floor(days / 30), j = Math.round(days % 30);
+  if (m === 0) return j + ' jours';
+  if (j === 0) return m + ' mois';
+  return m + ' mois et ' + j + ' jours';
+}
+
+function copyReport() {
+  var ta = document.getElementById('reportText');
+  ta.select();
+  try {
+    navigator.clipboard.writeText(ta.value).then(function() {
+      document.getElementById('reportCopied').style.display = 'block';
+      setTimeout(function(){ document.getElementById('reportCopied').style.display='none'; }, 3000);
+    });
+  } catch(e) {
+    document.execCommand('copy');
+    document.getElementById('reportCopied').style.display = 'block';
+    setTimeout(function(){ document.getElementById('reportCopied').style.display='none'; }, 3000);
+  }
+}
+
+
+// ══════════════════════════════════════════
+// TONUS DATA & RENDERING
+// ══════════════════════════════════════════
+
+const TONUS_NORMS = {
+  foulard: [
+    {ag:28, choices:[{val:"cont_far",lbl:"Coude > ligne mammaire controlatérale",norm:true},{val:"cont_line",lbl:"Coude à la ligne mammaire controlatérale",norm:false},{val:"mediane",lbl:"Entre médiane et mammaire controlatérale",norm:false},{val:"juste_med",lbl:"Juste à la ligne médiane",norm:false},{val:"homo",lbl:"Entre médiane et mammaire homolatérale",norm:false}]},
+    {ag:32, choices:[{val:"cont_far",lbl:"Coude > ligne mammaire controlatérale",norm:false},{val:"cont_line",lbl:"Coude à la ligne mammaire controlatérale",norm:true},{val:"mediane",lbl:"Entre médiane et mammaire controlatérale",norm:false},{val:"juste_med",lbl:"Juste à la ligne médiane",norm:false},{val:"homo",lbl:"Entre médiane et mammaire homolatérale",norm:false}]},
+    {ag:34, choices:[{val:"cont_far",lbl:"Coude > ligne mammaire controlatérale",norm:false},{val:"cont_line",lbl:"Coude à la ligne mammaire controlatérale",norm:false},{val:"mediane",lbl:"Entre médiane et mammaire controlatérale",norm:true},{val:"juste_med",lbl:"Juste à la ligne médiane",norm:false},{val:"homo",lbl:"Entre médiane et mammaire homolatérale",norm:false}]},
+    {ag:36, choices:[{val:"cont_far",lbl:"Coude > ligne mammaire controlatérale",norm:false},{val:"cont_line",lbl:"Coude à la ligne mammaire controlatérale",norm:false},{val:"mediane",lbl:"Entre médiane et mammaire controlatérale",norm:false},{val:"juste_med",lbl:"Juste à la ligne médiane",norm:true},{val:"homo",lbl:"Entre médiane et mammaire homolatérale",norm:false}]},
+    {ag:40, choices:[{val:"cont_far",lbl:"Coude > ligne mammaire controlatérale",norm:false},{val:"cont_line",lbl:"Coude à la ligne mammaire controlatérale",norm:false},{val:"mediane",lbl:"Entre médiane et mammaire controlatérale",norm:false},{val:"juste_med",lbl:"Juste à la ligne médiane",norm:false},{val:"homo",lbl:"Entre médiane et mammaire homolatérale",norm:true}]},
+  ],
+  talon_oreille: [
+    {ag:28, choices:[{val:"180_150",lbl:"180°-150°",norm:true},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90",lbl:"90°",norm:false}]},
+    {ag:32, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:true},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90",lbl:"90°",norm:false}]},
+    {ag:34, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:true},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90",lbl:"90°",norm:false}]},
+    {ag:36, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:true},{val:"100",lbl:"100°",norm:false},{val:"90",lbl:"90°",norm:false}]},
+    {ag:38, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:true},{val:"90",lbl:"90°",norm:false}]},
+    {ag:40, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90",lbl:"90°",norm:true}]},
+  ],
+  angle_poplite: [
+    {ag:28, choices:[{val:"180_150",lbl:"180°-150°",norm:true},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90_80",lbl:"90°-80°",norm:false}]},
+    {ag:32, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:true},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90_80",lbl:"90°-80°",norm:false}]},
+    {ag:34, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:true},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90_80",lbl:"90°-80°",norm:false}]},
+    {ag:36, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:true},{val:"100",lbl:"100°",norm:false},{val:"90_80",lbl:"90°-80°",norm:false}]},
+    {ag:38, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:true},{val:"90_80",lbl:"90°-80°",norm:false}]},
+    {ag:40, choices:[{val:"180_150",lbl:"180°-150°",norm:false},{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_110",lbl:"130°-110°",norm:false},{val:"110",lbl:"110°",norm:false},{val:"100",lbl:"100°",norm:false},{val:"90_80",lbl:"90°-80°",norm:true}]},
+  ],
+  adducteurs: [
+    {ag:28, choices:[{val:"150_130",lbl:"150°-130°",norm:true},{val:"130_100",lbl:"130°-100°",norm:false},{val:"100_80",lbl:"100°-80°",norm:false},{val:"80_60",lbl:"80°-60°",norm:false}]},
+    {ag:32, choices:[{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_100",lbl:"130°-100°",norm:true},{val:"100_80",lbl:"100°-80°",norm:false},{val:"80_60",lbl:"80°-60°",norm:false}]},
+    {ag:36, choices:[{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_100",lbl:"130°-100°",norm:false},{val:"100_80",lbl:"100°-80°",norm:true},{val:"80_60",lbl:"80°-60°",norm:false}]},
+    {ag:40, choices:[{val:"150_130",lbl:"150°-130°",norm:false},{val:"130_100",lbl:"130°-100°",norm:false},{val:"100_80",lbl:"100°-80°",norm:false},{val:"80_60",lbl:"80°-60°",norm:true}]},
+  ],
+  dorsiflexion: [
+    {ag:28, choices:[{val:"40p",lbl:">= 40°",norm:true},{val:"40_30",lbl:"40°-30°",norm:false},{val:"20_10",lbl:"20°-10°",norm:false},{val:"0",lbl:"0°",norm:false}]},
+    {ag:34, choices:[{val:"40p",lbl:">= 40°",norm:false},{val:"40_30",lbl:"40°-30°",norm:true},{val:"20_10",lbl:"20°-10°",norm:false},{val:"0",lbl:"0°",norm:false}]},
+    {ag:36, choices:[{val:"40p",lbl:">= 40°",norm:false},{val:"40_30",lbl:"40°-30°",norm:false},{val:"20_10",lbl:"20°-10°",norm:true},{val:"0",lbl:"0°",norm:false}]},
+    {ag:40, choices:[{val:"40p",lbl:">= 40°",norm:false},{val:"40_30",lbl:"40°-30°",norm:false},{val:"20_10",lbl:"20°-10°",norm:false},{val:"0",lbl:"0°",norm:true}]},
+  ],
+};
+
+function getNorm(test, agWeeks) {
+  const norms = TONUS_NORMS[test];
+  if (!norms) return null;
+  let best = norms[0];
+  for (const n of norms) { if (agWeeks >= n.ag) best = n; }
+  return best;
+}
+
+function getAgWeeks(profile, evalDate) {
+  if (!profile || !profile.dob || !evalDate) return null;
+  const ages = computeAges(profile, evalDate);
+  if (!ages) return null;
+  const birthSA = ages.isPrem ? Number(profile.sa) : 40;
+  return birthSA + ages.chrono / 7;
+}
+
+function getTonusData() {
+  const s = getS();
+  if (!s) return {};
+  if (!s.tonus) s.tonus = {};
+  return s.tonus;
+}
+
+function setTonusField(field, val) {
+  const s = getS();
+  if (!s) return;
+  if (!s.tonus) s.tonus = {};
+  s.tonus[field] = val;
+  saveProfiles();
+  renderTonus();
+}
+
+function choiceCard(test, title, agW, td) {
+  const norm = agW ? getNorm(test, agW) : null;
+  let html = '<div class="tonus-card">';
+  html += '<div class="tonus-card-title">' + title;
+  if (norm) {
+    const normChoice = norm.choices.find(ch => ch.norm);
+    if (normChoice) html += '<span class="tonus-norm">Norme : ' + normChoice.lbl + '</span>';
+  }
+  html += '</div>';
+  const allChoices = norm ? norm.choices : [];
+  html += '<div class="tonus-row"><div class="tonus-opts" style="flex-wrap:wrap">';
+  allChoices.forEach(ch => {
+    const sel = td[test+'_val'] === ch.val;
+    let cls = sel ? (ch.norm ? 'sel-ok' : 'sel-p1') : (ch.norm ? 'norm-badge' : '');
+    html += '<div class="topt '+cls+'" data-action="setTonus" data-field="'+test+'_val" data-val="'+ch.val+'">' + ch.lbl + '</div>';
+  });
+  html += '</div></div>';
+  html += dg_row(test, td);
+  html += '</div>';
+  return html;
+}
+
+function dg_row(prefix, td) {
+  let html = '<div class="tonus-dg">';
+  ['D','G'].forEach(side => {
+    html += '<span class="dg-label">'+side+'</span>';
+    const opts = [{key:'p1',lbl:'Limité',cls:'sel-p2'},{key:'p2',lbl:'Exagéré',cls:'sel-p1'}];
+    opts.forEach(({key,lbl,cls}) => {
+      const field = prefix+'_'+side.toLowerCase()+'_'+key;
+      const sel = td[field];
+      html += '<div class="topt '+(sel?cls:'')+'" data-action="toggleTonus" data-field="'+field+'">'+lbl+'</div>';
+    });
+    html += '<span style="width:12px"></span>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildTonus() {
+  const panel = document.getElementById('tonusPanel');
+  if (!panel) return;
+  const p = getP(), s = getS();
+  const td = getTonusData();
+  const agW = s && s.date && p ? getAgWeeks(p, s.date) : null;
+  const agLabel = agW != null ? Math.round(agW*10)/10+' semaines AG' : 'AG non calculable';
+
+  let html = '<div class="ag-info">Tonus — Age gestationnel équivalent : '+agLabel+'</div>';
+
+  // Tonus passif MS
+  html += '<div class="tonus-section">';
+  html += '<div class="tonus-section-title">Tonus Passif — Membres Supérieurs</div>';
+  html += choiceCard('foulard','Foulard',agW,td);
+  html += '</div>';
+
+  // Tonus passif MI
+  html += '<div class="tonus-section">';
+  html += '<div class="tonus-section-title">Tonus Passif — Membres Inférieurs</div>';
+  html += choiceCard('talon_oreille','Talon-oreille',agW,td);
+  html += choiceCard('angle_poplite','Angle poplité',agW,td);
+  html += choiceCard('adducteurs','Adducteurs',agW,td);
+  // Dorsiflexion — custom card with angle choices + stretch D/G
+  {
+    const norm = agW ? getNorm('dorsiflexion', agW) : null;
+    const normChoice = norm ? norm.choices.find(ch => ch.norm) : null;
+    let dhtml = '<div class="tonus-card">';
+    dhtml += '<div class="tonus-card-title">Dorsiflexion du pied';
+    if (normChoice) dhtml += '<span class="tonus-norm">Norme : ' + normChoice.lbl + '</span>';
+    dhtml += '</div>';
+    // Angle choices
+    dhtml += '<div class="tonus-row"><div class="tonus-opts" style="flex-wrap:wrap">';
+    (norm ? norm.choices : []).forEach(ch => {
+      const sel = td['dorsiflexion_val'] === ch.val;
+      const cls = sel ? (ch.norm ? 'sel-ok' : 'sel-p1') : (ch.norm ? 'norm-badge' : '');
+      dhtml += '<div class="topt '+cls+'" data-action="setTonus" data-field="dorsiflexion_val" data-val="'+ch.val+'">'+ch.lbl+'</div>';
+    });
+    dhtml += '</div></div>';
+    // Limité / Exagéré D/G (standard)
+    dhtml += dg_row('dorsiflexion', td);
+    // Stretch D / G
+    dhtml += '<div class="tonus-dg" style="margin-top:6px">';
+    dhtml += '<span style="font-size:10px;font-weight:700;color:var(--mid);min-width:60px">Stretch</span>';
+    ['d','g'].forEach(side => {
+      const lbl = side === 'd' ? 'D' : 'G';
+      const field = 'dorsiflexion_stretch_' + side;
+      const sel = td[field];
+      dhtml += '<div class="topt '+(sel?'sel-asy':'')+'" data-action="toggleTonus" data-field="'+field+'">Stretch '+lbl+'</div>';
+      dhtml += '<span style="width:8px"></span>';
+    });
+    dhtml += '</div>';
+    dhtml += '</div>';
+    html += dhtml;
+  }
+  html += '</div>';
+
+  // Tonus actif
+  html += '<div class="tonus-section">';
+  html += '<div class="tonus-section-title">Tonus Actif</div>';
+
+  // Tiré-assis axial
+  html += '<div class="tonus-card"><div class="tonus-card-title">Tiré-assis axial</div><div class="tonus-row"><div class="tonus-opts">';
+  [['Rien','sel-abs','ta_rien'],['Participation tête','sel-p1','ta_tete'],['Tête + épaules','sel-ok','ta_tete_ep']].forEach(([lbl,cls,val])=>{
+    const sel=td['tire_assis_axial']===val;
+    html+='<div class="topt '+(sel?cls:'')+'" data-action="setTonus" data-field="tire_assis_axial" data-val="'+val+'">'+lbl+'</div>';
+  });
+  html+='</div></div></div>';
+
+  // Tiré-assis latéral
+  html += '<div class="tonus-card"><div class="tonus-card-title">Tiré-assis latéral — Participation des bras</div><div class="tonus-row"><div class="tonus-opts">';
+  [['Oui','sel-ok','tal_oui'],['Non','sel-abs','tal_non'],['Asymétrie','sel-asy','tal_asy']].forEach(([lbl,cls,val])=>{
+    const sel=td['tire_assis_lat']===val;
+    html+='<div class="topt '+(sel?cls:'')+'" data-action="setTonus" data-field="tire_assis_lat" data-val="'+val+'">'+lbl+'</div>';
+  });
+  html+='</div></div></div>';
+
+  // Retournements
+  html += '<div class="tonus-card"><div class="tonus-card-title">Participation aux retournements</div><div class="tonus-row"><div class="tonus-opts">';
+  [['Oui','sel-ok','ret_oui'],['Partielle','sel-part','ret_part'],['Non','sel-abs','ret_non']].forEach(([lbl,cls,val])=>{
+    const sel=td['retournements']===val;
+    html+='<div class="topt '+(sel?cls:'')+'" data-action="setTonus" data-field="retournements" data-val="'+val+'">'+lbl+'</div>';
+  });
+  html+='</div></div></div>';
+
+  // Notes
+  html += '<div class="tonus-card"><div class="tonus-card-title">Observations</div>';
+  html += '<textarea class="tonus-note" data-action="saveTonus" placeholder="Notes sur le tonus...">'+(td['notes']||'')+'</textarea>';
+  html += '</div>';
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+
+// ══════════════════════════════════════════
+// ANAMNESE
+// ══════════════════════════════════════════
+const ANAMNESE_FIELDS = [
+  {section: 'Motif de consultation', fields: [
+    {key:'motif', label:'Motif de consultation', rows:3},
+    {key:'demande_parents', label:'Demande des parents / famille', rows:3},
+  ]},
+  {section: "Antécédents et histoire de l'enfant", fields: [
+    {key:'grossesse', label:'Grossesse', rows:2},
+    {key:'naissance', label:'Naissance / périnatal', rows:2},
+    {key:'atcd_medicaux', label:'Antécédents médicaux / chirurgicaux', rows:3},
+    {key:'traitements', label:'Traitements en cours', rows:2},
+    {key:'dev_moteur', label:'Développement moteur', rows:3},
+    {key:'dev_langage', label:'Développement du langage', rows:2},
+  ]},
+  {section: 'Environnement', fields: [
+    {key:'famille', label:'Composition familiale', rows:2},
+    {key:'mode_garde', label:'Mode de garde / scolarité', rows:2},
+    {key:'suivi', label:'Suivis en cours (orthophonie, kiné…)', rows:2},
+  ]},
+  {section: 'Observations complémentaires', fields: [
+    {key:'comportement', label:"Comportement rapporté par l'entourage", rows:3},
+    {key:'anamnese_notes', label:'Notes libres', rows:4},
+  ]},
+];
+
+function getAnamneseData() {
+  const s = getS();
+  if (!s) return {};
+  if (!s.anamnese) s.anamnese = {};
+  return s.anamnese;
+}
+
+function renderAnamnese() {
+  const panel = document.getElementById('anamnesePanel');
+  if (!panel) return;
+  const ad = getAnamneseData();
+  let html = '<div class="bilan-panel">';
+  ANAMNESE_FIELDS.forEach(function(sec) {
+    html += '<div class="bilan-section">';
+    html += '<div class="bilan-section-title">' + sec.section + '</div>';
+    sec.fields.forEach(function(f) {
+      html += '<div class="bilan-field">';
+      html += '<label>' + f.label + '</label>';
+      html += '<textarea rows="' + f.rows + '" data-action="saveAnamnese" data-key="' + f.key + '">' + (ad[f.key]||'') + '</textarea>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// OBSERVATION CLINIQUE
+// ══════════════════════════════════════════
+const OBS_MOTEUR_LEFT = [
+  'Observation GMs',
+  'Motricité spontanée',
+  'Acquisitions motrices, diversité du répertoire',
+  'Indépendance des parties du corps',
+  'Fluidité et contrôle des mouvements',
+  'Mouvements enchainés',
+  'Adaptations sensori-motrices',
+];
+const OBS_MOTEUR_RIGHT = [
+  {label:'Position de référence', cols:['DD','DV','Assis']},
+  {label:'Régulation motrice, aisance', cols:['+','±','-']},
+  {label:'Motricité fine, utilisation regard', cols:['+','±','-']},
+  {label:'Préhension, conservation objet', cols:['+','±','-']},
+  {label:'Coordinations bi-manuelles', cols:['+','±','-']},
+  {label:"Engagement des deux bras dans l'espace", cols:['+','±','-']},
+  {label:'Coordinations mains pieds, main bouche…', cols:['+','±','-']},
+];
+const OBS_PERCEPTION = [
+  'Connaissance du corps propre',
+  'Créativité explorations',
+  'Modes exploratoires',
+  'Appétence, créativité',
+  'Connaissance des objets et des personnes',
+  'Cause à effet',
+  'Expressivité',
+  'Compétences sociales : contact, pointage, attention conjointe…',
+  'Communication gestuelle',
+  'Communication verbales',
+  'Synchronie et accordage des interactions',
+  'Régulation émotionnelle',
+  'Fonction des interactions',
+  'Stabilité, disponibilité, sécurité',
+  'Ouverture au monde',
+  'Sollicitations',
+];
+
+function getObsData() {
+  const s = getS();
+  if (!s) return {};
+  if (!s.obs) s.obs = {};
+  return s.obs;
+}
+
+function renderObs() {
+  const panel = document.getElementById('obsPanel');
+  if (!panel) return;
+  const od = getObsData();
+  let html = '<div class="bilan-panel">';
+
+  // ── Équipement moteur ──
+  html += '<div class="bilan-section">';
+  html += '<div class="bilan-section-title">Équipement moteur de base / mises en situations corporelles</div>';
+  html += '<div style="padding:12px 16px;overflow-x:auto">';
+  html += '<table class="obs-table"><thead><tr>';
+  html += '<th style="width:220px;text-align:left">Item</th><th>+</th><th>±</th><th>−</th>';
+  html += '<th style="width:200px">Item</th><th colspan="3" style="text-align:left">Commentaires</th>';
+  html += '</tr></thead><tbody>';
+
+  const maxRows = Math.max(OBS_MOTEUR_LEFT.length, OBS_MOTEUR_RIGHT.length);
+  for (let i = 0; i < maxRows; i++) {
+    html += '<tr>';
+    // Left: item + +/±/- radio
+    if (i < OBS_MOTEUR_LEFT.length) {
+      const lbl = OBS_MOTEUR_LEFT[i];
+      const key = 'ml_' + i;
+      html += '<td>' + lbl + '</td>';
+      ['+','±','-'].forEach(function(v,vi) {
+        html += '<td class="obs-cb-cell"><input type="radio" class="obs-radio" name="' + key + '" value="' + vi + '" ' + (od[key]==vi?'checked':'') + ' data-action="setObs" data-key="' + key + '" data-val="' + vi + '"></td>';
+      });
+    } else {
+      html += '<td></td><td></td><td></td><td></td>';
+    }
+    // Right: item label + comment field only (no radio buttons)
+    if (i < OBS_MOTEUR_RIGHT.length) {
+      const ritem = OBS_MOTEUR_RIGHT[i];
+      const ckey = 'mr_c_' + i;
+      html += '<td style="font-size:11px;color:var(--slate);font-weight:500">' + ritem.label + '</td>';
+      html += '<td colspan="3"><textarea class="obs-comment" data-action="saveObs" data-key="' + ckey + '">' + (od[ckey]||'') + '</textarea></td>';
+    } else {
+      html += '<td></td><td colspan="3"></td>';
+    }
+    html += '</tr>';
+  }
+
+  // Type de préhension
+  html += '<tr style="border-top:2px solid var(--light)">';
+  html += '<td colspan="4" style="font-weight:700;font-size:11px;padding:8px 10px">Fonctions de la motricité</td>';
+  html += '<td colspan="4"></td></tr>';
+  html += '<tr>';
+  html += '<td style="font-weight:700;font-size:11px">Type de préhension</td>';
+  html += '<td colspan="3" style="text-align:center"><label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px"><input type="radio" class="obs-radio" name="prehension" value="0" '+(od['prehension']==0?'checked':'')+' data-action="setObs" data-key="prehension" data-val="0"> Cubito-palmaire</label></td>';
+  html += '<td style="text-align:center"><label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px"><input type="radio" class="obs-radio" name="prehension" value="1" '+(od['prehension']==1?'checked':'')+' data-action="setObs" data-key="prehension" data-val="1"> Palmaire</label></td>';
+  html += '<td colspan="3" style="text-align:center"><label style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:4px"><input type="radio" class="obs-radio" name="prehension" value="2" '+(od['prehension']==2?'checked':'')+' data-action="setObs" data-key="prehension" data-val="2"> Digitale</label></td>';
+  html += '</tr>';
+
+  // Commentaires moteur
+  html += '<tr><td colspan="8" style="padding:8px 10px"><label style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mid)">Commentaires</label><br><textarea class="obs-comment" style="min-height:50px;margin-top:4px" data-action="saveObs" data-key="obs_moteur_comment">'+(od['obs_moteur_comment']||'')+'</textarea></td></tr>';
+  html += '</tbody></table>';
+  html += '</div></div>';
+
+  // ── Perception / Communication ──
+  html += '<div class="bilan-section" style="margin-top:16px">';
+  html += '<div class="bilan-section-title">Perception ou connaissance du monde / modes et outils de communication</div>';
+  html += '<div style="padding:12px 16px;overflow-x:auto">';
+  html += '<table class="obs-table"><thead><tr>';
+  html += '<th style="text-align:left">Item</th><th>+</th><th>±</th><th>−</th><th style="width:200px;text-align:left">Commentaires</th>';
+  html += '</tr></thead><tbody>';
+  OBS_PERCEPTION.forEach(function(lbl, i) {
+    const key = 'pc_' + i;
+    const ckey = 'pc_c_' + i;
+    html += '<tr>';
+    html += '<td>' + lbl + '</td>';
+    ['+','±','-'].forEach(function(v,vi) {
+      html += '<td class="obs-cb-cell"><input type="radio" class="obs-radio" name="' + key + '" value="' + vi + '" ' + (od[key]==vi?'checked':'') + ' data-action="setObs" data-key="' + key + '" data-val="' + vi + '"></td>';
+    });
+    html += '<td><textarea class="obs-comment" data-action="saveObs" data-key="' + ckey + '">' + (od[ckey]||'') + '</textarea></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '</div></div>';
+
+  // Notes générales
+  html += '<div class="bilan-section" style="margin-top:16px">';
+  html += '<div class="bilan-section-title">Notes générales d\'observation</div>';
+  html += '<div class="bilan-field"><textarea rows="4" data-action="saveObs" data-key="obs_notes_gen">' + (od['obs_notes_gen']||'') + '</textarea></div>';
+  html += '</div>';
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+
+function renderTonus() {
+  buildTonus();
+}
+
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function switchSec(sec,el){
+  curSec=sec;
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.remove('on'));
+  if(el) el.classList.add('on');
+  const isPml = sec==='pml'||sec==='pcvm';
+  document.getElementById('pmlPcvmPanel').style.display  = isPml?'':'none';
+  document.getElementById('tonusPanel').style.display    = sec==='tonus'?'':'none';
+  document.getElementById('anamnesePanel').style.display = sec==='anamnese'?'':'none';
+  document.getElementById('obsPanel').style.display      = sec==='obs'?'':'none';
+  // Right panel (curves+results) hidden for non-assessment tabs
+  const rightPanel = document.querySelector('.rp');
+  if(rightPanel) rightPanel.style.display = (sec==='anamnese'||sec==='obs')?'none':'';
+  if(sec==='tonus') renderTonus();
+  else if(sec==='anamnese') renderAnamnese();
+  else if(sec==='obs') renderObs();
+  else renderAll();
+}
+function switchPtab(el,pane){el.parentNode.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));document.getElementById(pane).classList.add('on');}
+function renderAll(){renderSessbar();buildItems();updateStats();drawCurve();}
+
+window.addEventListener('resize',()=>{if(document.getElementById('scEval').classList.contains('on'))drawCurve();});
+loadProfiles();
+renderProfiles();
+
+// ── Service Worker registration (fichier sw.js reel) ──
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+// ══════════════════════════════════════════
+// UNIFIED EVENT DELEGATION (no inline onclick)
+// ══════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  // find closest element with data-action
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+  
+  if (action === 'openNewProfile') {
+    ['mnom','mprenom'].forEach(function(i){ document.getElementById(i).value=''; });
+    document.getElementById('mdob').value='';
+    document.getElementById('mprem').checked=false;
+    document.getElementById('msa').value='';
+    document.getElementById('msa').disabled=true;
+    document.getElementById('ovProfile').classList.add('on');
+    setTimeout(function(){ document.getElementById('mnom').focus(); }, 50);
+  }
+  else if (action === 'goBack') { goBack(); }
+  else if (action === 'print') { window.print(); }
+  else if (action === 'switchSec') { switchSec(el.dataset.sec, el); }
+  else if (action === 'calcNMF') { calcNMF(); }
+  else if (action === 'switchPtab') { switchPtab(el, el.dataset.pane); }
+  else if (action === 'closeOv') { editingSid=null; closeOv(el.dataset.ov); }
+  else if (action === 'createProfile') { createProfile(); }
+  else if (action === 'createSession') { createSession(); }
+  else if (action === 'toggle') {
+    e.stopPropagation();
+    toggle(el.dataset.sid, parseInt(el.dataset.iid));
+  }
+  else if (action === 'deleteProfile') {
+    e.stopPropagation();
+    var pid = el.dataset.pid;
+    if (confirm('Supprimer ce patient et toutes ses données ?')) {
+      profiles = profiles.filter(function(x){ return x.id !== pid; });
+      saveProfiles();
+      renderProfiles();
+    }
+  }
+  else if (action === 'saveNotes') { /* handled by input event */ }
+  else if (action === 'togglePrem') {
+    const msa = document.getElementById('msa');
+    msa.disabled = !el.checked;
+    if (!el.checked) msa.value = '';
+  }
+  else if (action === 'setObs') {
+    const s = getS(); if(!s) return;
+    if(!s.obs) s.obs = {};
+    const val = isNaN(el.dataset.val) ? el.dataset.val : parseInt(el.dataset.val);
+    s.obs[el.dataset.key] = val;
+    saveProfiles();
+  }
+  else if (action === 'setTonus') {
+    setTonusField(el.dataset.field, isNaN(el.dataset.val) ? el.dataset.val : parseInt(el.dataset.val));
+  }
+  else if (action === 'toggleTonus') {
+    const s = getS(); if(!s) return;
+    if(!s.tonus) s.tonus = {};
+    s.tonus[el.dataset.field] = !s.tonus[el.dataset.field];
+    saveProfiles(); renderTonus();
+  }
+  else if (action === 'genReport') { generateReport(); }
+  else if (action === 'copyReport') { copyReport(); }
+  else if (action === 'exportData') { openExport(); }
+  else if (action === 'importData') { openImport(); }
+  else if (action === 'pwdConfirm') { pwdConfirm(); }
+});
+
+document.addEventListener('input', function(e) {
+  if (e.target.dataset && e.target.dataset.action === 'saveNotes') {
+    saveNotes();
+  }
+  if (e.target.dataset && e.target.dataset.action === 'saveTonus') {
+    const s = getS(); if(!s) return;
+    if(!s.tonus) s.tonus = {};
+    s.tonus['notes'] = e.target.value;
+    saveProfiles();
+  }
+  if (e.target.dataset && e.target.dataset.action === 'saveAnamnese') {
+    const s = getS(); if(!s) return;
+    if(!s.anamnese) s.anamnese = {};
+    s.anamnese[e.target.dataset.key] = e.target.value;
+    saveProfiles();
+  }
+  if (e.target.dataset && e.target.dataset.action === 'saveObs') {
+    const s = getS(); if(!s) return;
+    if(!s.obs) s.obs = {};
+    s.obs[e.target.dataset.key] = e.target.value;
+    saveProfiles();
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('ovPwd').classList.contains('on')) {
+    pwdConfirm();
+  }
+});
+
+
+</script>
+<!-- MODAL COMPTE RENDU -->
+<div class="overlay" id="ovReport">
+  <div class="modal" style="max-width:640px;max-height:90vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="margin:0">Compte rendu</h2>
+      <div style="display:flex;gap:8px">
+        <button class="mbtn pri" id="copyReportBtn" data-action="copyReport" style="padding:8px 16px;font-size:12px">📋 Copier</button>
+        <button class="mbtn sec" data-action="closeOv" data-ov="ovReport" style="padding:8px 12px;font-size:12px">Fermer</button>
+      </div>
+    </div>
+    <textarea id="reportText" style="flex:1;min-height:420px;width:100%;border:1.5px solid var(--light);
+      border-radius:8px;padding:14px;font-family:Georgia,serif;font-size:13px;line-height:1.7;
+      color:var(--slate);background:var(--bg);resize:none" readonly></textarea>
+    <div id="reportCopied" style="display:none;text-align:center;color:var(--green);font-size:12px;font-weight:600;margin-top:8px">
+      ✅ Texte copié dans le presse-papiers
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
