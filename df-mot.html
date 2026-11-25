@@ -304,7 +304,7 @@ textarea.notes:focus{outline:2px solid var(--blue);}
         <button class="calc-btn" data-action="calcNMF">📊 Calculer NMF &amp; Écart-type</button>
         <div id="nmfblock" style="display:none;margin-top:12px">
           <div class="nmfbox"><div class="nmfv" id="nmfv">—</div><div class="nmfl">Niveau Moteur Fonctionnel</div></div>
-          <div class="sdd"><div class="sdv z" id="sdv">—</div><div class="sdlbl">σ par rapport à l'âge chronologique</div></div>
+          <div class="sdd"><div class="sdv z" id="sdv">—</div><div class="sdlbl">σ par rapport à l'âge de référence (corrigé jusqu'à 24 mois)</div></div>
           <div id="nmfdetail" style="font-size:11px;color:var(--mid);margin-top:8px;line-height:1.6;background:var(--bg);border-radius:6px;padding:8px"></div>
           <button class="calc-btn" style="background:#334155;margin-top:8px" data-action="genReport">📋 Générer le compte rendu</button>
         </div>
@@ -663,8 +663,9 @@ function renderProfiles(){
   el.innerHTML='';
   profiles.forEach(p=>{
     const ini=((p.nom[0]||'')+(p.prenom[0]||'')).toUpperCase();
-    const cal=p.dob&&!isNaN(new Date(p.dob))?calDiff(new Date(p.dob).getTime(),Date.now()):null;
-    const ageTxt=cal?(cal.m<24?cal.m+'m':Math.floor(cal.m/12)+'a'):'?';
+    const agNow=computeAges(p,new Date().toISOString().split('T')[0]);
+    const cal=agNow?agNow.refCal:null;
+    const ageTxt=cal?(cal.m<24?cal.m+'m'+(agNow.useCorr?' (corrigé)':''):Math.floor(cal.m/12)+'a'):'?';
     const c=document.createElement('div');c.className='pcard';
     c.innerHTML=`<div class="avatar">${ini||'?'}</div>
       <div class="pinfo">
@@ -916,7 +917,8 @@ function updateStats(){
   const dob=p&&p.dob?p.dob:null;
   const dt=s&&s.date?s.date:null;
   if(dob&&dt&&r){
-    const ca=(new Date(dt)-new Date(dob))/864e5;
+    const ag0=computeAges(p,dt);
+    const ca=ag0?ag0.ref:(new Date(dt)-new Date(dob))/864e5;
     const diff=r.ag-ca, sv=(diff/r.sd).toFixed(2);
     const el=document.getElementById('sdv');
     el.textContent=(diff>=0?'+':'')+sv+' σ';
