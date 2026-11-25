@@ -934,10 +934,18 @@ function updateStats(){
     const ages=computeAges(pr,cs.date);
     if(ages){
       const useCorr = ages.useCorr;
-      let ageTxt='Âge réel : '+fmtCal(ages.chronoCal);
+      let ageTxt='Âge à la passation du '+new Date(cs.date).toLocaleDateString('fr-FR')+' : réel '+fmtCal(ages.chronoCal);
       if(ages.isPrem){
-        ageTxt+=' · Âge corrigé : '+fmtCal(ages.corrCal);
+        ageTxt+=' · corrigé '+fmtCal(ages.corrCal);
         ageTxt+=' — Référence utilisée : '+(useCorr?'âge corrigé':'âge réel (≥ 24m corrigés)');
+      }
+      const today=new Date().toISOString().split('T')[0];
+      if(cs.date!==today){
+        const agesNow=computeAges(pr,today);
+        if(agesNow){
+          ageTxt+=' | Aujourd\'hui : réel '+fmtCal(agesNow.chronoCal);
+          if(agesNow.isPrem) ageTxt+=' · corrigé '+fmtCal(agesNow.corrCal);
+        }
       }
       hageEl.textContent=ageTxt;
       hageEl.style.display='block';

@@ -1,6 +1,6 @@
 // Service Worker DF-MOT : met en cache le code uniquement (jamais de donnees patient).
 // Incrementer CACHE a chaque nouvelle version deployee.
-const CACHE = 'dfmot-v3';
+const CACHE = 'dfmot-v4';
 const SHELL = ['./', './df-mot.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
